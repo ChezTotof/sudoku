@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Emoji Sudoku Challenge</title>
+    <meta property="og:title" content="Joue à mon Emoji Sudoku !">
+    <meta property="og:description" content="Peux-tu résoudre ce puzzle ? 3 niveaux de difficulté avec des symboles funs !">
+    <meta property="og:image" content="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/apple/325/thinking-face_1f914.png">
+    
+    <style>
+        /* --- THEME SOMBRE --- */
+        :root { 
+            --primary: #9e70ff; 
+            --danger: #ff5252; 
+            --text: #ffffff;
+            --grid-border: #555;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            /* Fond d'écran sombre */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1531685218889-7345b7748581?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text); 
+            display: flex; flex-direction: column; align-items: center; 
+            margin: 0; padding: 10px; min-height: 100vh;
+        }
+        
+        h1 { margin: 10px 0; font-size: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        p { font-size: 1.1rem; }
+
+        .container-box {
+            background: rgba(0, 0, 0, 0.5); 
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+        }
+
+        /* Menu Start */
+        #start-screen { display: flex; flex-direction: column; gap: 15px; margin-top: 50px; }
+        .btn { padding: 12px 24px; font-size: 1.2rem; border: none; border-radius: 8px; cursor: pointer; color: white; transition: transform 0.2s, filter 0.2s; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+        .btn:active { transform: scale(0.95); }
+        .btn:hover { filter: brightness(1.1); }
+        .btn-easy { background: linear-gradient(45deg, #4caf50, #81c784); }
+        .btn-medium { background: linear-gradient(45deg, #ff9800, #ffb74d); }
+        .btn-hard { background: linear-gradient(45deg, #f44336, #e57373); }
+        .btn-action { background: var(--primary); font-size: 1rem; padding: 10px 16px; margin: 5px; border: 1px solid rgba(255,255,255,0.2); }
+        
+        /* Game Board */
+        #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;}
+        .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px black; padding: 0 10px;}
+        
+        #board { 
+            display: grid; grid-template-columns: repeat(9, 1fr); 
+            gap: 1px; background: var(--grid-border); border: 3px solid var(--grid-border);
+            width: 100%; aspect-ratio: 1; margin-bottom: 20px;
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .cell { 
+            background: rgba(255, 255, 255, 0.1); 
+            color: white;
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.8rem; cursor: pointer; user-select: none;
+            transition: background 0.2s;
+        }
+        .cell.selected { background: rgba(158, 112, 255, 0.5) !important; }
+        .cell.fixed { 
+            background: rgba(255, 255, 255, 0.25); 
+            color: #ddd; cursor: default; 
+        }
+        .cell.error { background: rgba(244, 67, 54, 0.6) !important; }
+        
+        .cell:nth-child(3n) { border-right: 3px solid var(--grid-border); }
+        .cell:nth-child(9n) { border-right: none; }
+        .cell:nth-child(n+19):nth-child(-n+27), 
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-border); }
+
+        /* Controls */
+        #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; }
+        .key { 
+            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1); color: white;
+            border-radius: 8px; font-size: 1.8rem; padding: 10px 0; cursor: pointer; text-align: center; transition: background 0.2s;
+        }
+        .key:hover { background: rgba(255, 255, 255, 0.3); }
+        .key:active { background: var(--primary); }
+        
+        .key.completed {
+            opacity: 0.3;
+            background: #222;
+            cursor: default;
+            pointer-events: none;
+            border-color: #444;
+        }
+        
+        #controls { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; width: 100%; }
+        
+        /* Modal */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: linear-gradient(135deg, #2b2b4b, #1a1a2e); color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .fb-btn { margin-top:20px; background: #1877F2; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;}
+
+        /* Style des boutons de la modale */
+        .modal-actions {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .modal-actions .btn {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" class="container-box">
+        <h1>Emoji Sudoku 🧩</h1>
+        <p style="color:#ccc">Choisis ton niveau pour commencer :</p>
+        <button class="btn btn-easy" onclick="startGame('easy')">Facile (Débutant)</button>
+        <button class="btn btn-medium" onclick="startGame('medium')">Moyen (Habitué)</button>
+        <button class="btn btn-hard" onclick="startGame('hard')">Difficile (Expert)</button>
+    </div>
+
+    <div id="game-screen">
+        <div class="stats">
+            <span id="mistakes">Erreurs: 0/3</span>
+            <span id="hints">Indice: 1/1</span>
+        </div>
+        
+        <div id="board"></div>
+
+        <div id="keypad">
+            </div>
+
+        <div id="controls">
+            <button class="btn btn-action" onclick="eraseCell()">Gomme ⌫</button>
+            <button class="btn btn-action" onclick="useHint()" id="btn-hint">Indice 💡</button>
+            <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
+        </div>
+        <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+            Partager sur Facebook
+        </button>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content container-box">
+            <h2 id="modal-title" style="font-size: 2rem; margin-bottom: 10px;"></h2>
+            <p id="modal-msg" style="font-size: 1.2rem; margin-bottom: 25px;"></p>
+            <div class="modal-actions">
+                <button class="btn btn-action" style="background: #4caf50; font-size: 1.2rem; padding: 15px 30px;" onclick="location.reload()">Rejouer</button>
+                <button class="btn btn-action" style="background: #03a9f4; font-size: 1.2rem; padding: 15px 30px;" onclick="goToStartScreen()">Accueil 🏠</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- Configuration & Variables ---
+    const emojis = ['👍', '💥', '🤡', '🔥', '♥️', '😈', '🎉', '🌀', '🌍'];
+    let solution = [];
+    let initialBoard = [];
+    let currentBoard = [];
+    let mistakes = 0;
+    const maxMistakes = 3;
+    let hintsUsed = 0;
+    const maxHints = 1;
+    let selectedCellIndex = -1;
+    let gameOver = false;
+
+    // --- Logique Sudoku (Génération) ---
+    function isValid(board, row, col, num) {
+        for (let x = 0; x < 9; x++) if (board[row][x] === num || board[x][col] === num) return false;
+        const startRow = row - row % 3, startCol = col - col % 3;
+        for (let i = 0; i < 3; i++)
+            for (let j = 0; j < 3; j++)
+                if (board[i + startRow][j + startCol] === num) return false;
+        return true;
+    }
+
+    function solveSudoku(board) {
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (board[i][j] === 0) {
+                    let nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - 0.5);
+                    for (let num of nums) {
+                        if (isValid(board, i, j, num)) {
+                            board[i][j] = num;
+                            if (solveSudoku(board)) return true;
+                            board[i][j] = 0;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function generateBoard(difficulty) {
+        let board = Array.from({ length: 9 }, () => Array(9).fill(0));
+        solveSudoku(board);
+        solution = board.map(row => [...row]); 
+
+        let holes;
+        switch(difficulty) {
+            case 'easy': holes = 30; break;
+            case 'medium': holes = 45; break;
+            case 'hard': holes = 58; break; 
+            default: holes = 30;
+        }
+
+        while (holes > 0) {
+            let row = Math.floor(Math.random() * 9);
+            let col = Math.floor(Math.random() * 9);
+            if (board[row][col] !== 0) {
+                board[row][col] = 0;
+                holes--;
+            }
+        }
+        return board;
+    }
+
+    // --- Fonctions de Navigation ---
+
+    function goToStartScreen() {
+        // 1. Réinitialiser l'état du jeu
+        gameOver = false;
+        selectedCellIndex = -1;
+        
+        // 2. Cacher l'écran de jeu et afficher l'écran d'accueil
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'flex';
+        
+        // 3. Fermer la modale si elle est ouverte
+        document.getElementById('modal').style.display = 'none'; 
+    }
+
+    // --- Interface & Moteur de Jeu ---
+    function startGame(diff) {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'flex';
+        
+        // Reset états
+        mistakes = 0;
+        hintsUsed = 0;
+        gameOver = false;
+        selectedCellIndex = -1;
+        updateStatsUI();
+
+        let matrix = generateBoard(diff);
+        initialBoard = matrix.flat(); 
+        solution = solution.flat();
+        currentBoard = [...initialBoard];
+        
+        renderBoard();
+        renderKeypad();
+        updateKeypadStatus(); 
+    }
+
+    function updateStatsUI() {
+        document.getElementById('mistakes').textContent = `Erreurs: ${mistakes}/${maxMistakes}`;
+        document.getElementById('hints').textContent = `Indice: ${hintsUsed}/${maxHints}`;
+        document.getElementById('btn-hint').style.opacity = hintsUsed >= maxHints ? "0.5" : "1";
+    }
+
+    function renderBoard() {
+        const boardDiv = document.getElementById('board');
+        boardDiv.innerHTML = '';
+        currentBoard.forEach((val, idx) => {
+            let div = document.createElement('div');
+            div.className = 'cell';
+            div.id = `cell-${idx}`;
+            
+            if (initialBoard[idx] !== 0) {
+                div.classList.add('fixed');
+                div.textContent = emojis[val - 1];
+            } else if (val !== 0) {
+                div.textContent = emojis[val - 1];
+            }
+            
+            div.onclick = () => selectCell(idx);
+            boardDiv.appendChild(div);
+        });
+    }
+
+    function renderKeypad() {
+        const kp = document.getElementById('keypad');
+        kp.innerHTML = ''; 
+        emojis.forEach((emoji, idx) => {
+            let btn = document.createElement('div');
+            btn.className = 'key';
+            btn.id = `key-${idx+1}`;
+            btn.textContent = emoji;
+            btn.onclick = (e) => { e.stopPropagation(); inputNumber(idx + 1); };
+            kp.appendChild(btn);
+        });
+    }
+
+    function updateKeypadStatus() {
+        let counts = Array(10).fill(0);
+        currentBoard.forEach(val => {
+            if (val !== 0) counts[val]++;
+        });
+
+        for (let i = 1; i <= 9; i++) {
+            const btn = document.getElementById(`key-${i}`);
+            if (btn) {
+                if (counts[i] === 9) {
+                    btn.classList.add('completed');
+                } else {
+                    btn.classList.remove('completed');
+                }
+            }
+        }
+    }
+
+    function selectCell(idx) {
+        if (gameOver) return;
+        if (selectedCellIndex !== -1) document.getElementById(`cell-${selectedCellIndex}`).classList.remove('selected');
+        selectedCellIndex = idx;
+        document.getElementById(`cell-${idx}`).classList.add('selected');
+    }
+
+    function inputNumber(num) {
+        if (gameOver || selectedCellIndex === -1 || initialBoard[selectedCellIndex] !== 0) return;
+
+        let cell = document.getElementById(`cell-${selectedCellIndex}`);
+        let correctVal = solution[selectedCellIndex];
+
+        if (num !== correctVal) {
+            mistakes++;
+            updateStatsUI();
+            cell.classList.add('error');
+            cell.textContent = emojis[num-1];
+            
+            setTimeout(() => {
+                if (!gameOver) {
+                    cell.classList.remove('error');
+                    if (currentBoard[selectedCellIndex] === 0) cell.textContent = '';
+                }
+            }, 800);
+            
+            if (mistakes >= maxMistakes) endGame(false);
+        } else {
+            currentBoard[selectedCellIndex] = num;
+            cell.textContent = emojis[num - 1];
+            cell.classList.remove('selected');
+            selectedCellIndex = -1;
+            
+            updateKeypadStatus();
+            checkWin();
+        }
+    }
+
+    function eraseCell() {
+        if (gameOver || selectedCellIndex === -1 || initialBoard[selectedCellIndex] !== 0) return;
+        currentBoard[selectedCellIndex] = 0;
+        document.getElementById(`cell-${selectedCellIndex}`).textContent = '';
+        updateKeypadStatus(); 
+    }
+
+    function useHint() {
+        if (gameOver || hintsUsed >= maxHints) return;
+        
+        let targetIdx = selectedCellIndex;
+        if (targetIdx === -1 || currentBoard[targetIdx] !== 0) {
+           let emptyIndices = currentBoard.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null);
+           if (emptyIndices.length === 0) return;
+           targetIdx = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+           selectCell(targetIdx);
+        }
+
+        hintsUsed++;
+        let correctVal = solution[targetIdx];
+        currentBoard[targetIdx] = correctVal;
+        let cell = document.getElementById(`cell-${targetIdx}`);
+        cell.textContent = emojis[correctVal - 1];
+        
+        cell.style.transition = "all 0.3s";
+        cell.style.transform = "scale(1.2)";
+        cell.style.background = "rgba(255, 255, 0, 0.3)";
+        setTimeout(() => {
+             cell.style.transform = "scale(1)";
+             cell.style.background = "";
+        }, 300);
+
+        updateStatsUI();
+        updateKeypadStatus();
+        checkWin();
+    }
+
+    function checkWin() {
+        if (!currentBoard.includes(0)) endGame(true);
+    }
+
+    function endGame(win) {
+        gameOver = true;
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modal-title');
+        const msg = document.getElementById('modal-msg');
+        
+        setTimeout(() => {
+            modal.style.display = 'flex';
+            if (win) {
+                title.innerHTML = "🎉 Victoire ! 🎉";
+                msg.textContent = "Bravo, tu as résolu le Emoji Sudoku !";
+            } else {
+                title.innerHTML = "☠️ Game Over ☠️";
+                msg.textContent = "Tu as fait 3 erreurs. Retente ta chance !";
+            }
+        }, 500);
+    }
+
+    function shareOnFacebook() {
+        // NOUVELLE FONCTION SIMPLIFIÉE POUR ÉVITER LES BLOCAGES DE POP-UP
+        const url = encodeURIComponent(window.location.href); 
+        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        window.open(shareUrl, '_blank'); // Ouvre dans un nouvel onglet
+        return false;
+    }
+</script>
+</body>
+</html>
