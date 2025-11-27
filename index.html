@@ -14,7 +14,9 @@
             --primary: #9e70ff; 
             --danger: #ff5252; 
             --text: #ffffff;
-            --grid-border: #555;
+            --grid-border: #bb86fc;
+            --subgrid-border: #800080;
+            --cell-gap-color: #333;
         }
         
         body { 
@@ -76,10 +78,10 @@
         }
         .cell.error { background: rgba(244, 67, 54, 0.6) !important; }
         
-        .cell:nth-child(3n) { border-right: 3px solid var(--grid-border); }
+        .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border); }
         .cell:nth-child(9n) { border-right: none; }
         .cell:nth-child(n+19):nth-child(-n+27), 
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-border); }
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--subgrid-border); }
 
         /* Controls */
         #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; }
