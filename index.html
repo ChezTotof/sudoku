@@ -86,7 +86,7 @@
             transition: background 0.2s;
         }
         
-        .cell.selected { background: #FFD700 !important; } /* NOUVEAU: Surbrillance jaune vif */
+        .cell.selected { background: #FFD700 !important; } /* Surbrillance jaune vif */
         
         .cell.fixed { 
             background: #EBEBEB; /* Fond des cellules fixes en gris clair */
@@ -158,7 +158,7 @@
     <div id="game-screen">
         <div class="stats">
             <span id="mistakes">Erreurs: 0/3</span>
-            <span id="hints">Indice: 1/1</span>
+            <span id="hints">Indice: 0/3</span>
         </div>
         
         <div id="board"></div>
@@ -167,7 +167,6 @@
             </div>
 
         <div id="controls">
-            <button class="btn btn-action" onclick="eraseCell()">Gomme ⌫</button>
             <button class="btn btn-action" onclick="useHint()" id="btn-hint">Indice 💡</button>
             <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
         </div>
@@ -197,7 +196,7 @@
     let mistakes = 0;
     const maxMistakes = 3;
     let hintsUsed = 0;
-    const maxHints = 1;
+    const maxHints = 3; // NOUVEAU: Max 3 indices
     let selectedCellIndex = -1;
     let gameOver = false;
     const SAVE_KEY = 'emojiSudokuSave';
@@ -447,14 +446,8 @@
         }
     }
 
-    function eraseCell() {
-        if (gameOver || selectedCellIndex === -1 || initialBoard[selectedCellIndex] !== 0) return;
-        currentBoard[selectedCellIndex] = 0;
-        document.getElementById(`cell-${selectedCellIndex}`).textContent = '';
-        updateKeypadStatus();
-        saveGame(); // Sauvegarde l'effacement
-    }
-
+    // NOTE : La fonction eraseCell() a été retirée.
+    
     function useHint() {
         if (gameOver || hintsUsed >= maxHints) return;
         
