@@ -404,21 +404,29 @@
         let correctVal = solution[selectedCellIndex];
 
         if (num !== correctVal) {
-            mistakes++;
-            updateStatsUI();
-            saveGame(); // Sauvegarde l'erreur
-            cell.classList.add('error');
-            cell.textContent = emojis[num-1];
-            
-            setTimeout(() => {
-                if (!gameOver) {
-                    cell.classList.remove('error');
-                    if (currentBoard[selectedCellIndex] === 0) cell.textContent = '';
-                }
-            }, 800);
-            
-            if (mistakes >= maxMistakes) endGame(false);
-        } else {
+    mistakes++;
+    updateStatsUI();
+    saveGame(); 
+
+    // 🟢 NOUVELLE LOGIQUE pour afficher l'emoji d'erreur
+    const previousContent = cell.textContent; // Sauvegarde le contenu avant l'erreur
+
+    cell.textContent = '😵‍💫'; // Affiche l'emoji Vertige
+    cell.classList.add('error');
+
+    // Fait disparaître l'emoji d'erreur après 800 millisecondes (0.8s)
+    setTimeout(() => {
+        if (!gameOver) {
+            cell.classList.remove('error');
+            // Réaffiche l'ancien contenu (si c'était un chiffre) ou le vide
+            cell.textContent = currentBoard[selectedCellIndex] !== 0 
+                               ? emojis[currentBoard[selectedCellIndex] - 1] 
+                               : '';
+        }
+    }, 800);
+
+    if (mistakes >= maxMistakes) endGame(false);
+} else {
             currentBoard[selectedCellIndex] = num;
             cell.textContent = emojis[num - 1];
             cell.classList.remove('selected');
