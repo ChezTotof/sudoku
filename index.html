@@ -32,11 +32,11 @@
         p { font-size: 1.1rem; }
 
         .container-box {
-            background: rgba(0, 0, 0, 0.5); 
+            background: rgba(255, 255, 255, 0.7); /* Fond clair semi-transparent */
             padding: 25px;
             border-radius: 15px;
             backdrop-filter: blur(5px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre légère */
             text-align: center;
         }
 
@@ -77,16 +77,16 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
         .cell { 
-            background: rgba(255, 255, 255, 0.1); 
-            color: white;
+            background: #FAFAFA; /* Fond des cellules en blanc très clair */
+            color: #333333; /* Texte des emojis en sombre */
             display: flex; align-items: center; justify-content: center; 
             font-size: 1.8rem; cursor: pointer; user-select: none;
             transition: background 0.2s;
         }
-        .cell.selected { background: rgba(158, 112, 255, 0.5) !important; }
         .cell.fixed { 
-            background: rgba(255, 255, 255, 0.25); 
-            color: #ddd; cursor: default; 
+            background: #EBEBEB; /* Fond des cellules fixes en gris clair */
+            color: #555555; /* Texte des emojis fixes en gris */
+            cursor: default; 
         }
         .cell.error { background: rgba(244, 67, 54, 0.6) !important; }
         
