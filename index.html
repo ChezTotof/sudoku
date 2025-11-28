@@ -76,18 +76,21 @@
             border-radius: 8px; overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
-        .cell { 
-            background: #FAFAFA; /* Fond des cellules en blanc très clair */
-            color: #333333; /* Texte des emojis en sombre */
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.8rem; cursor: pointer; user-select: none;
-            transition: background 0.2s;
-        }
-        .cell.fixed { 
-            background: #EBEBEB; /* Fond des cellules fixes en gris clair */
-            color: #555555; /* Texte des emojis fixes en gris */
-            cursor: default; 
-        }
+        78   .cell { 
+79       background: #FAFAFA; /* Fond des cellules en blanc très clair */
+80       color: #333333; /* Texte des emojis en sombre */
+81       display: flex; align-items: center; justify-content: center; 
+82       font-size: 1.8rem; cursor: pointer; user-select: none;
+83       transition: background 0.2s;
+84   }
+85   /* 🟡 NOUVELLE LIGNE À INSÉRER ICI : */
+86   .cell.selected { background: #FFD700 !important; } 
+87
+88   .cell.fixed { 
+89       background: #EBEBEB; /* Fond des cellules fixes en gris clair */
+90       color: #555555; /* Texte des emojis fixes en gris */
+91       cursor: default; 
+92   }
         .cell.error { background: rgba(244, 67, 54, 0.6) !important; }
         
         .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border); }
