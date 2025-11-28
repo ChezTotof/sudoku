@@ -14,15 +14,14 @@
             --primary: #9e70ff; 
             --danger: #ff5252; 
             --text: #ffffff;
-            --grid-border: #000000;
-            --subgrid-border: #EB3310;
-            --cell-gap-color: #FCFC05;
+            --grid-border: #000000; /* Bordure extérieure : NOIR PUR */
+            --subgrid-border: #000000; /* Bordures 3x3 : NOIR PUR */
+            --cell-gap-color: #FFFF00; /* Lignes fines entre cellules : JAUNE */
         }
         
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            /* Fond d'écran sombre */
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('logo.pgn');
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('logo.jpn);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -48,18 +47,33 @@
         .btn { padding: 12px 24px; font-size: 1.2rem; border: none; border-radius: 8px; cursor: pointer; color: white; transition: transform 0.2s, filter 0.2s; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
         .btn:active { transform: scale(0.95); }
         .btn:hover { filter: brightness(1.1); }
+        
+        /* Bouton Continuer (Spécial) */
+        #btn-continue { 
+            background: linear-gradient(45deg, #03a9f4, #29b6f6); 
+            border: 2px solid white; 
+            display: none; /* Caché par défaut */
+            animation: pulse 2s infinite;
+        }
+
         .btn-easy { background: linear-gradient(45deg, #4caf50, #81c784); }
         .btn-medium { background: linear-gradient(45deg, #ff9800, #ffb74d); }
         .btn-hard { background: linear-gradient(45deg, #f44336, #e57373); }
         .btn-action { background: var(--primary); font-size: 1rem; padding: 10px 16px; margin: 5px; border: 1px solid rgba(255,255,255,0.2); }
         
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         /* Game Board */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;}
         .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px black; padding: 0 10px;}
         
         #board { 
             display: grid; grid-template-columns: repeat(9, 1fr); 
-            gap: 1px; background: var(--grid-border); border: 3px solid var(--grid-border);
+            gap: 1px; background: var(--cell-gap-color); border: 3px solid var(--grid-border);
             width: 100%; aspect-ratio: 1; margin-bottom: 20px;
             border-radius: 8px; overflow: hidden;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
@@ -123,6 +137,9 @@
 
     <div id="start-screen" class="container-box">
         <h1>Emoji Sudoku 🧩</h1>
+        
+        <button id="btn-continue" class="btn" onclick="continueGame()">▶ Continuer la partie</button>
+        
         <p style="color:#ccc">Choisis ton niveau pour commencer :</p>
         <button class="btn btn-easy" onclick="startGame('easy')">Facile (Débutant)</button>
         <button class="btn btn-medium" onclick="startGame('medium')">Moyen (Habitué)</button>
@@ -146,7 +163,7 @@
             <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
         </div>
         <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
             Partager sur Facebook
         </button>
     </div>
@@ -156,7 +173,7 @@
             <h2 id="modal-title" style="font-size: 2rem; margin-bottom: 10px;"></h2>
             <p id="modal-msg" style="font-size: 1.2rem; margin-bottom: 25px;"></p>
             <div class="modal-actions">
-                <button class="btn btn-action" style="background: #4caf50; font-size: 1.2rem; padding: 15px 30px;" onclick="location.reload()">Rejouer</button>
+                <button class="btn btn-action" style="background: #4caf50; font-size: 1.2rem; padding: 15px 30px;" onclick="restartGame()">Rejouer</button>
                 <button class="btn btn-action" style="background: #03a9f4; font-size: 1.2rem; padding: 15px 30px;" onclick="goToStartScreen()">Accueil 🏠</button>
             </div>
         </div>
@@ -164,7 +181,7 @@
 
 <script>
     // --- Configuration & Variables ---
-    const emojis = ['👍', '🍔', '🎅', '📢', '♥️', '🍟', '🚐', '🌀', '🧺'];
+    const emojis = ['👍', '💥', '🤡', '🔥', '♥️', '😈', '🎉', '🌀', '🌍'];
     let solution = [];
     let initialBoard = [];
     let currentBoard = [];
@@ -174,6 +191,14 @@
     const maxHints = 1;
     let selectedCellIndex = -1;
     let gameOver = false;
+    const SAVE_KEY = 'emojiSudokuSave';
+
+    // --- Vérification de sauvegarde au démarrage ---
+    window.onload = function() {
+        if (localStorage.getItem(SAVE_KEY)) {
+            document.getElementById('btn-continue').style.display = 'block';
+        }
+    };
 
     // --- Logique Sudoku (Génération) ---
     function isValid(board, row, col, num) {
@@ -228,27 +253,54 @@
         return board;
     }
 
-    // --- Fonctions de Navigation ---
+    // --- Fonctions de Sauvegarde ---
+    function saveGame() {
+        const gameState = {
+            solution: solution,
+            initialBoard: initialBoard,
+            currentBoard: currentBoard,
+            mistakes: mistakes,
+            hintsUsed: hintsUsed
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+        // Affiche le bouton continuer si on revient au menu
+        document.getElementById('btn-continue').style.display = 'block';
+    }
 
-    function goToStartScreen() {
-        // 1. Réinitialiser l'état du jeu
+    function continueGame() {
+        const savedData = localStorage.getItem(SAVE_KEY);
+        if (!savedData) return;
+
+        const state = JSON.parse(savedData);
+        solution = state.solution;
+        initialBoard = state.initialBoard;
+        currentBoard = state.currentBoard;
+        mistakes = state.mistakes;
+        hintsUsed = state.hintsUsed;
+        
         gameOver = false;
         selectedCellIndex = -1;
+
+        // Lancer l'interface
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'flex';
+        document.getElementById('modal').style.display = 'none';
         
-        // 2. Cacher l'écran de jeu et afficher l'écran d'accueil
-        document.getElementById('game-screen').style.display = 'none';
-        document.getElementById('start-screen').style.display = 'flex';
-        
-        // 3. Fermer la modale si elle est ouverte
-        document.getElementById('modal').style.display = 'none'; 
+        updateStatsUI();
+        renderBoard();
+        renderKeypad();
+        updateKeypadStatus();
     }
 
     // --- Interface & Moteur de Jeu ---
     function startGame(diff) {
+        // Efface l'ancienne sauvegarde si on commence une nouvelle partie
+        localStorage.removeItem(SAVE_KEY);
+        document.getElementById('btn-continue').style.display = 'none';
+
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'flex';
         
-        // Reset états
         mistakes = 0;
         hintsUsed = 0;
         gameOver = false;
@@ -262,7 +314,25 @@
         
         renderBoard();
         renderKeypad();
-        updateKeypadStatus(); 
+        updateKeypadStatus();
+        saveGame(); // Sauvegarde initiale
+    }
+    
+    function restartGame() {
+         location.reload();
+    }
+
+    function goToStartScreen() {
+        gameOver = false;
+        selectedCellIndex = -1;
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'flex';
+        document.getElementById('modal').style.display = 'none';
+        
+        // Vérifie s'il y a une sauvegarde pour afficher le bouton
+        if (localStorage.getItem(SAVE_KEY)) {
+            document.getElementById('btn-continue').style.display = 'block';
+        }
     }
 
     function updateStatsUI() {
@@ -338,6 +408,7 @@
         if (num !== correctVal) {
             mistakes++;
             updateStatsUI();
+            saveGame(); // Sauvegarde l'erreur
             cell.classList.add('error');
             cell.textContent = emojis[num-1];
             
@@ -356,6 +427,7 @@
             selectedCellIndex = -1;
             
             updateKeypadStatus();
+            saveGame(); // Sauvegarde le coup
             checkWin();
         }
     }
@@ -364,7 +436,8 @@
         if (gameOver || selectedCellIndex === -1 || initialBoard[selectedCellIndex] !== 0) return;
         currentBoard[selectedCellIndex] = 0;
         document.getElementById(`cell-${selectedCellIndex}`).textContent = '';
-        updateKeypadStatus(); 
+        updateKeypadStatus();
+        saveGame(); // Sauvegarde l'effacement
     }
 
     function useHint() {
@@ -394,6 +467,7 @@
 
         updateStatsUI();
         updateKeypadStatus();
+        saveGame(); // Sauvegarde l'indice
         checkWin();
     }
 
@@ -403,6 +477,10 @@
 
     function endGame(win) {
         gameOver = true;
+        // Supprime la sauvegarde car la partie est finie
+        localStorage.removeItem(SAVE_KEY);
+        document.getElementById('btn-continue').style.display = 'none';
+
         const modal = document.getElementById('modal');
         const title = document.getElementById('modal-title');
         const msg = document.getElementById('modal-msg');
@@ -420,10 +498,9 @@
     }
 
     function shareOnFacebook() {
-        // NOUVELLE FONCTION SIMPLIFIÉE POUR ÉVITER LES BLOCAGES DE POP-UP
         const url = encodeURIComponent(window.location.href); 
         const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-        window.open(shareUrl, '_blank'); // Ouvre dans un nouvel onglet
+        window.open(shareUrl, '_blank'); 
         return false;
     }
 </script>
