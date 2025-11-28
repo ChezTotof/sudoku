@@ -9,28 +9,29 @@
     <meta property="og:image" content="https://cdn.jsdelivr.net/emojione/assets/png/1f3c6.png">
     
     <style>
-        /* --- THEME SOMBRE --- */
+        /* --- THEME CLAIR/VIOLET --- */
         :root { 
-            --primary: #9e70ff; 
+            --primary: #9e70ff; /* Violet principal */
             --danger: #ff5252; 
-            --text: #ffffff;
-            --grid-border: #000000; 
-            --subgrid-border: #27E7F5; 
-            --cell-gap-color: #D627F5; 
+            --text: #333333; /* Texte sombre pour fond clair */
+            --grid-border: #000000; /* Bordure extérieure : NOIR PUR */
+            --subgrid-border: #000000; /* Bordures 3x3 : NOIR PUR */
+            --cell-gap-color: #9e70ff; /* Lignes fines entre cellules : VIOLET */
         }
         
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            /* Nouveau fond en gris clair #EBE7E6 */
+            /* Nouveau fond en gris clair */
             background: #EBE7E6; 
-            color: #333333; /* Changement de la couleur du texte en sombre pour le contraste */
+            color: #333333; /* Couleur du texte principal en sombre */
             display: flex; flex-direction: column; align-items: center; 
             margin: 0; padding: 10px; min-height: 100vh;
         }
         
-        h1 { margin: 10px 0; font-size: 2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        h1 { margin: 10px 0; font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         p { font-size: 1.1rem; }
 
+        /* Conteneurs pour le thème clair */
         .container-box {
             background: rgba(255, 255, 255, 0.7); /* Fond clair semi-transparent */
             padding: 25px;
@@ -67,30 +68,32 @@
 
         /* Game Board */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;}
-        .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px black; padding: 0 10px;}
+        .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); padding: 0 10px; color: var(--text);}
         
         #board { 
             display: grid; grid-template-columns: repeat(9, 1fr); 
             gap: 1px; background: var(--cell-gap-color); border: 3px solid var(--grid-border);
             width: 100%; aspect-ratio: 1; margin-bottom: 20px;
             border-radius: 8px; overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        78   .cell { 
-79       background: #FAFAFA; /* Fond des cellules en blanc très clair */
-80       color: #333333; /* Texte des emojis en sombre */
-81       display: flex; align-items: center; justify-content: center; 
-82       font-size: 1.8rem; cursor: pointer; user-select: none;
-83       transition: background 0.2s;
-84   }
-85   /* 🟡 NOUVELLE LIGNE À INSÉRER ICI : */
-86   .cell.selected { background: #FFD700 !important; } 
-87
-88   .cell.fixed { 
-89       background: #EBEBEB; /* Fond des cellules fixes en gris clair */
-90       color: #555555; /* Texte des emojis fixes en gris */
-91       cursor: default; 
-92   }
+        
+        .cell { 
+            background: #FAFAFA; /* Fond des cellules en blanc très clair */
+            color: #333333; /* Texte des emojis en sombre */
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.8rem; cursor: pointer; user-select: none;
+            transition: background 0.2s;
+        }
+        
+        .cell.selected { background: #FFD700 !important; } /* NOUVEAU: Surbrillance jaune vif */
+        
+        .cell.fixed { 
+            background: #EBEBEB; /* Fond des cellules fixes en gris clair */
+            color: #555555; /* Texte des emojis fixes en gris */
+            cursor: default; 
+        }
+        
         .cell.error { background: rgba(244, 67, 54, 0.6) !important; }
         
         .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border); }
@@ -99,27 +102,32 @@
         .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--subgrid-border); }
 
         /* Controls */
-        #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; }
+        #keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 12px; }
         .key { 
-            background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.1); color: white;
+            background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0,0,0,0.1); color: var(--text);
             border-radius: 8px; font-size: 1.8rem; padding: 10px 0; cursor: pointer; text-align: center; transition: background 0.2s;
         }
-        .key:hover { background: rgba(255, 255, 255, 0.3); }
-        .key:active { background: var(--primary); }
+        .key:hover { background: rgba(0, 0, 0, 0.1); }
+        .key:active { background: var(--primary); color: white; }
         
         .key.completed {
             opacity: 0.3;
-            background: #222;
+            background: #CCC;
             cursor: default;
             pointer-events: none;
-            border-color: #444;
+            border-color: #AAA;
         }
         
         #controls { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; width: 100%; }
         
         /* Modal */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { background: linear-gradient(135deg, #2b2b4b, #1a1a2e); color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-content { 
+            background: white; 
+            color: var(--text);
+            border: 1px solid rgba(0,0,0,0.1); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
         .fb-btn { margin-top:20px; background: #1877F2; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;}
 
         /* Style des boutons de la modale */
@@ -141,7 +149,7 @@
         
         <button id="btn-continue" class="btn" onclick="continueGame()">▶ Continuer la partie</button>
         
-        <p style="color:#ccc">Choisis ton niveau pour commencer :</p>
+        <p style="color:#666">Choisis ton niveau pour commencer :</p>
         <button class="btn btn-easy" onclick="startGame('easy')">Facile (Débutant)</button>
         <button class="btn btn-medium" onclick="startGame('medium')">Moyen (Habitué)</button>
         <button class="btn btn-hard" onclick="startGame('hard')">Difficile (Expert)</button>
@@ -164,7 +172,7 @@
             <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
         </div>
         <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
             Partager sur Facebook
         </button>
     </div>
@@ -407,29 +415,27 @@
         let correctVal = solution[selectedCellIndex];
 
         if (num !== correctVal) {
-    mistakes++;
-    updateStatsUI();
-    saveGame(); 
+            mistakes++;
+            updateStatsUI();
+            saveGame(); 
 
-    // 🟢 NOUVELLE LOGIQUE pour afficher l'emoji d'erreur
-    const previousContent = cell.textContent; // Sauvegarde le contenu avant l'erreur
-
-    cell.textContent = '😵‍💫'; // Affiche l'emoji Vertige
-    cell.classList.add('error');
-
-    // Fait disparaître l'emoji d'erreur après 800 millisecondes (0.8s)
-    setTimeout(() => {
-        if (!gameOver) {
-            cell.classList.remove('error');
-            // Réaffiche l'ancien contenu (si c'était un chiffre) ou le vide
-            cell.textContent = currentBoard[selectedCellIndex] !== 0 
-                               ? emojis[currentBoard[selectedCellIndex] - 1] 
-                               : '';
-        }
-    }, 800);
-
-    if (mistakes >= maxMistakes) endGame(false);
-} else {
+            // LOGIQUE d'erreur : Affiche l'emoji Vertige
+            const previousContent = cell.textContent;
+            cell.textContent = '😵‍💫'; // Emoji Vertige
+            cell.classList.add('error');
+            
+            setTimeout(() => {
+                if (!gameOver) {
+                    cell.classList.remove('error');
+                    // Réaffiche l'ancien contenu (s'il y en avait)
+                    cell.textContent = currentBoard[selectedCellIndex] !== 0 
+                                       ? emojis[currentBoard[selectedCellIndex] - 1] 
+                                       : '';
+                }
+            }, 800);
+            
+            if (mistakes >= maxMistakes) endGame(false);
+        } else {
             currentBoard[selectedCellIndex] = num;
             cell.textContent = emojis[num - 1];
             cell.classList.remove('selected');
@@ -468,7 +474,7 @@
         
         cell.style.transition = "all 0.3s";
         cell.style.transform = "scale(1.2)";
-        cell.style.background = "rgba(255, 255, 0, 0.3)";
+        cell.style.background = "rgba(158, 112, 255, 0.3)"; // Mise en évidence temporaire de l'indice
         setTimeout(() => {
              cell.style.transform = "scale(1)";
              cell.style.background = "";
