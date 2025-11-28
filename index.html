@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Emoji Sudoku Challenge</title>
-    <meta property="og:title" content="Joue au Sudoku chez Totof !">
+    <meta property="og:title" content="Joue à mon Emoji Sudoku !">
     <meta property="og:description" content="Peux-tu résoudre ce puzzle ? 3 niveaux de difficulté avec des symboles funs !">
     <meta property="og:image" content="https://cdn.jsdelivr.net/emojione/assets/png/1f3c6.png">
     
@@ -21,8 +21,8 @@
         
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            /* Nouveau fond en gris clair */
-            background: #EBE7E6; 
+            /* Fond transparent pour afficher l'image du Game Screen */
+            background: transparent; 
             color: #333333; /* Couleur du texte principal en sombre */
             display: flex; flex-direction: column; align-items: center; 
             margin: 0; padding: 10px; min-height: 100vh;
@@ -67,7 +67,16 @@
         }
 
         /* Game Board */
-        #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;}
+        #game-screen { 
+            display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;
+            /* 🍔🍟 FOND D'ÉCRAN BURGER/FRITES 🍟🍔 */
+            background: url('burger_frites-removebg-preview-removebg-preview.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 80vh; 
+            border-radius: 15px; 
+            padding: 20px;
+        }
+
         .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); padding: 0 10px; color: var(--text);}
         
         #board { 
