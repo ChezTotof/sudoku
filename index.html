@@ -21,8 +21,8 @@
         
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            /* Fond transparent pour afficher l'image du Game Screen */
-            background: transparent; 
+            /* Rétablissement du fond gris clair pour le look général */
+            background: #EBE7E6; 
             color: #333333; /* Couleur du texte principal en sombre */
             display: flex; flex-direction: column; align-items: center; 
             margin: 0; padding: 10px; min-height: 100vh;
@@ -69,12 +69,21 @@
         /* Game Board */
         #game-screen { 
             display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;
-            /* 🍔🍟 FOND D'ÉCRAN BURGER/FRITES 🍟🍔 */
-            background: url('burger_frites-removebg-preview-removebg-preview.png') no-repeat center center fixed;
-            background-size: cover;
+            /* 🍔🍟 FOND D'ÉCRAN BURGER/FRITES (pour l'effet de centrage) 🍟🍔 */
+            background: url('burger_frites-removebg-preview-removebg-preview.png') no-repeat center bottom; 
+            background-size: 100% auto; 
             min-height: 80vh; 
             border-radius: 15px; 
             padding: 20px;
+        }
+
+        /* 💡 NOUVEAU STYLE: FOND SEMI-TRANSPARENT pour la lisibilité sur l'image */
+        #game-content-overlay {
+            background: rgba(255, 255, 255, 0.85); /* Fond blanc opaque à 85% */
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .stats { display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); padding: 0 10px; color: var(--text);}
@@ -165,25 +174,26 @@
     </div>
 
     <div id="game-screen">
-        <div class="stats">
-            <span id="mistakes">Erreurs: 0/3</span>
-            <span id="hints">Indice: 0/3</span>
-        </div>
-        
-        <div id="board"></div>
-
-        <div id="keypad">
+        <div id="game-content-overlay"> 
+            <div class="stats">
+                <span id="mistakes">Erreurs: 0/3</span>
+                <span id="hints">Indice: 0/3</span>
             </div>
+            
+            <div id="board"></div>
 
-        <div id="controls">
-            <button class="btn btn-action" onclick="useHint()" id="btn-hint">Indice 💡</button>
-            <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
-        </div>
-        <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
-            Partager sur Facebook
-        </button>
-    </div>
+            <div id="keypad">
+                </div>
+
+            <div id="controls">
+                <button class="btn btn-action" onclick="useHint()" id="btn-hint">Indice 💡</button>
+                <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
+            </div>
+            <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
+                Partager sur Facebook
+            </button>
+        </div> </div>
 
     <div id="modal">
         <div class="modal-content container-box">
@@ -205,7 +215,7 @@
     let mistakes = 0;
     const maxMistakes = 3;
     let hintsUsed = 0;
-    const maxHints = 3; // NOUVEAU: Max 3 indices
+    const maxHints = 3; 
     let selectedCellIndex = -1;
     let gameOver = false;
     const SAVE_KEY = 'emojiSudokuSave';
