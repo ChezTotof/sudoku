@@ -30,7 +30,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            background-image: url('burger_frites-removebg-preview-removebg-preview.png'); /* Assurez-vous que le chemin est correct */
+            /* L'image de fond dépend de votre fichier 'burger_frites-removebg-preview-removebg-preview.png' */
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -389,32 +389,25 @@
     const DAILY_SAVE_KEY_PREFIX = 'dailySudokuSave_';
 
     // --- Générateur de Nombre Pseudo-Aléatoire Déterminé (Seed) ---
-    // Fonction qui génère une série de nombres aléatoires déterministe
     function seededRandom(seed) {
         let x = Math.sin(seed++) * 10000;
         return x - Math.floor(x);
     }
 
-    // Fonction qui génère une graine basée sur la date du jour (YYYYDDD)
     function generateDailySeed() {
         const now = new Date();
-        // Calcule le jour de l'année
         const start = new Date(now.getFullYear(), 0, 0);
         const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         const oneDay = 1000 * 60 * 60 * 24;
         const dayOfYear = Math.floor(diff / oneDay);
-        // Graine = Année * 1000 + Jour de l'année
         return now.getFullYear() * 1000 + dayOfYear;
     }
 
     // --- Vérification de sauvegarde au démarrage ---
     window.onload = function() {
-        // 1. Vérifie la sauvegarde de partie normale
         if (localStorage.getItem(SAVE_KEY)) {
             document.getElementById('btn-continue').style.display = 'block';
         }
-
-        // 2. Vérification de la partie quotidienne terminée
         checkDailyChallengeStatus();
     };
     
@@ -431,13 +424,11 @@
                 dailyButton.disabled = true;
                 dailyButton.classList.add('completed');
              } else {
-                 // Partie quotidienne en cours
                 dailyButton.textContent = "Défi Quotidien (En Cours)";
                 dailyButton.disabled = false;
                 dailyButton.classList.remove('completed');
              }
          } else {
-             // Nouvelle partie quotidienne disponible
              dailyButton.textContent = "Défi Quotidien 🆕";
              dailyButton.disabled = false;
              dailyButton.classList.remove('completed');
@@ -455,16 +446,22 @@
         return true;
     }
 
-    function solveSudoku(board, randomFunc) {
+    // MODIFIÉ pour éviter la boucle infinie et le blocage du navigateur
+    function solveSudoku(board, randomFunc, attempts = 0, limit = 50000) {
+        // Limite de sécurité pour empêcher le blocage
+        if (attempts > limit) return false; 
+        
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
                 if (board[i][j] === 0) {
-                    // Utilise la fonction aléatoire fournie (ou Math.random par défaut)
                     let nums = [1,2,3,4,5,6,7,8,9].sort(() => randomFunc() - 0.5);
                     for (let num of nums) {
                         if (isValid(board, i, j, num)) {
                             board[i][j] = num;
-                            if (solveSudoku(board, randomFunc)) return true;
+                            
+                            // Appel récursif avec compteur incrémenté
+                            if (solveSudoku(board, randomFunc, attempts + 1, limit)) return true; 
+                            
                             board[i][j] = 0;
                         }
                     }
@@ -486,8 +483,14 @@
             randomGenerator = Math.random;
         }
 
-        // Le solveur utilise le générateur déterministe si seed est présent
-        solveSudoku(board, randomGenerator);
+        // Utilise la fonction solveSudoku modifiée (avec limite)
+        const result = solveSudoku(board, randomGenerator);
+        if (!result) {
+            console.error("Échec critique : Le Sudoku n'a pas pu être résolu.");
+            // En cas d'échec, retourne une grille vide pour éviter un blocage total
+            return Array.from({ length: 9 }, () => Array(9).fill(0));
+        }
+
         solution = board.map(row => [...row]); 
 
         let holes;
@@ -495,11 +498,10 @@
             case 'easy': holes = 30; break;
             case 'medium': holes = 45; break;
             case 'hard': holes = 58; break; 
-            case 'daily': holes = 48; break; // Difficulté fixe pour le défi (entre medium et hard)
+            case 'daily': holes = 48; break; 
             default: holes = 30;
         }
         
-        // Utilise le générateur aléatoire déterministe (basé sur une seed différente pour ne pas être trivial)
         const rng = seed !== null ? (() => seededRandom(seed * 3 + 1234)) : Math.random;
 
         while (holes > 0) {
@@ -545,16 +547,13 @@
         mistakes = state.mistakes;
         hintsUsed = state.hintsUsed;
         
-        // On s'assure qu'on ne continue pas une partie quotidienne par erreur
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        localStorage.removeItem(dailyKey); // Supprime toute référence à une ancienne partie quotidienne
+        localStorage.removeItem(dailyKey); 
 
-        // Lancer l'interface
         setupGameScreen();
     }
 
-    // Fonction commune pour démarrer l'interface de jeu
     function setupGameScreen() {
         gameOver = false;
         selectedCellIndex = -1;
@@ -571,19 +570,16 @@
     
     // --- Fonctions de Démarrage ---
     
-    // Fonction pour démarrer le défi quotidien
     function startDailyChallenge() {
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         
-        // Supprime l'ancienne sauvegarde de la partie normale si elle existe
         localStorage.removeItem(SAVE_KEY);
         document.getElementById('btn-continue').style.display = 'none';
 
         if (localStorage.getItem(dailyKey)) {
-             // Charger la partie quotidienne existante
             const state = JSON.parse(localStorage.getItem(dailyKey));
-            if (state.isComplete) return; // Déjà complété
+            if (state.isComplete) return; 
             
             solution = state.solution;
             initialBoard = state.initialBoard;
@@ -592,42 +588,35 @@
             hintsUsed = state.hintsUsed;
             
         } else {
-             // Nouvelle partie quotidienne
             mistakes = 0;
             hintsUsed = 0;
-            // Génère la grille en utilisant la graine du jour
             let matrix = generateBoard('daily', dailySeed);
             initialBoard = matrix.flat(); 
             solution = solution.flat();
             currentBoard = [...initialBoard];
-            saveGame(true); // Sauvegarde initiale du défi quotidien
+            saveGame(true); 
         }
         
-        // Initialisation de l'interface pour le défi
         setupGameScreen();
     }
     
-    // Fonction pour démarrer une nouvelle partie (non-quotidienne)
     function startGame(diff) {
-        // Efface l'ancienne sauvegarde si on commence une nouvelle partie
         localStorage.removeItem(SAVE_KEY);
         document.getElementById('btn-continue').style.display = 'none';
 
-        // Efface l'ancienne sauvegarde du défi quotidien (on ne veut pas de conflit)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         localStorage.removeItem(dailyKey);
 
         mistakes = 0;
         hintsUsed = 0;
-        // Génère une grille normale (sans seed spécifique)
         let matrix = generateBoard(diff);
         initialBoard = matrix.flat(); 
         solution = solution.flat();
         currentBoard = [...initialBoard];
         
         setupGameScreen();
-        saveGame(false); // Sauvegarde initiale de la partie normale
+        saveGame(false);
     }
     
     function goToStartScreen() {
@@ -637,7 +626,6 @@
         document.getElementById('start-screen').style.display = 'flex';
         document.getElementById('modal').style.display = 'none';
         
-        // Mise à jour de l'état des boutons au retour à l'accueil
         if (localStorage.getItem(SAVE_KEY)) {
             document.getElementById('btn-continue').style.display = 'block';
         } else {
@@ -675,8 +663,7 @@
 
     function renderKeypad() {
         const kp = document.getElementById('keypad');
-        // On garde le bouton effacer pour le remettre à la fin
-        const deleteButtonHTML = kp.querySelector('.delete') ? kp.querySelector('.delete').outerHTML : `<div class="key delete" onclick="inputNumber(0)">Effacer</div>`;
+        const deleteButtonHTML = `<div class="key delete" onclick="inputNumber(0)">Effacer</div>`;
         
         kp.innerHTML = ''; 
         emojis.forEach((emoji, idx) => {
@@ -688,7 +675,6 @@
             kp.appendChild(btn);
         });
         
-        // Ajout du bouton Effacer
         kp.insertAdjacentHTML('beforeend', deleteButtonHTML);
     }
 
@@ -712,7 +698,6 @@
 
     function selectCell(idx) {
         if (gameOver) return;
-        // La cellule fixe ne peut pas être sélectionnée
         if (initialBoard[idx] !== 0) {
             if (selectedCellIndex !== -1) document.getElementById(`cell-${selectedCellIndex}`).classList.remove('selected');
             selectedCellIndex = -1; 
@@ -730,12 +715,11 @@
         let cell = document.getElementById(`cell-${selectedCellIndex}`);
         let correctVal = solution[selectedCellIndex];
         
-        // Déterminer la clé de sauvegarde (normale ou quotidienne)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         const isDailyGame = localStorage.getItem(dailyKey) !== null && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily';
 
-        if (num === 0) { // Clic sur "Effacer"
+        if (num === 0) { 
             currentBoard[selectedCellIndex] = 0;
             cell.textContent = '';
             cell.classList.remove('selected');
@@ -750,7 +734,6 @@
             updateStatsUI();
             saveGame(isDailyGame); 
 
-            // LOGIQUE d'erreur : Affiche l'emoji Vertige
             cell.textContent = '😵‍💫'; 
             cell.classList.add('error');
             
@@ -787,7 +770,6 @@
            selectCell(targetIdx);
         }
         
-        // Déterminer la clé de sauvegarde (normale ou quotidienne)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         const isDailyGame = localStorage.getItem(dailyKey) !== null && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily';
@@ -800,13 +782,13 @@
         
         cell.style.transition = "all 0.3s";
         cell.style.transform = "scale(1.2)";
-        cell.style.background = "rgba(0, 224, 255, 0.3)"; // Couleur néon pour l'indice
+        cell.style.background = "rgba(0, 224, 255, 0.3)"; 
         setTimeout(() => {
              cell.style.transform = "scale(1)";
              cell.style.background = "";
              cell.classList.remove('selected');
              selectedCellIndex = -1;
-             renderBoard(); // Force un re-rendu pour réappliquer les styles de grille
+             renderBoard(); 
         }, 300);
 
         updateStatsUI();
@@ -822,7 +804,6 @@
     function endGame(win) {
         gameOver = true;
         
-        // Déterminer si c'est la partie quotidienne
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         const dailyState = localStorage.getItem(dailyKey) ? JSON.parse(localStorage.getItem(dailyKey)) : null;
@@ -831,13 +812,11 @@
         if (dailyState && dailyState.difficulty === 'daily' && !dailyState.isComplete) {
             isDailyGame = true;
             if (win) {
-                 // Marquer le défi quotidien comme complété
                 dailyState.isComplete = true;
                 localStorage.setItem(dailyKey, JSON.stringify(dailyState));
             }
         }
         
-        // Supprime la sauvegarde normale si la partie est finie
         if (!isDailyGame) {
             localStorage.removeItem(SAVE_KEY);
             document.getElementById('btn-continue').style.display = 'none';
@@ -848,7 +827,6 @@
         const title = document.getElementById('modal-title');
         const msg = document.getElementById('modal-msg');
         
-        // --- Gérer l'animation de victoire ---
         if (win) {
             const boardDiv = document.getElementById('board');
             boardDiv.classList.add('victory-animation'); 
@@ -870,7 +848,6 @@
                 msg.textContent = "Tu as fait 3 erreurs. Retente ta chance !";
             }
             
-            // Met à jour le bouton Défi Quotidien s'il a été complété
             if (isDailyGame) {
                checkDailyChallengeStatus();
             }
@@ -878,7 +855,6 @@
     }
 
     function shareOnFacebook() {
-        // Le message doit être pertinent pour le défi quotidien si c'est le cas
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         const dailyState = localStorage.getItem(dailyKey) ? JSON.parse(localStorage.getItem(dailyKey)) : null;
