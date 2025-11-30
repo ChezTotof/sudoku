@@ -6,13 +6,21 @@
     <title>Emoji Sudoku - Classique</title>
     <style>
         /* --- VARIABLES --- */
+        /* --- VARIABLES --- */
+        /* --- VARIABLES --- */
         :root {
             --neon-pink: #FF0099;
             --neon-blue: #00E0FF;
             --neon-green: #00FF00;
             --main-text-color: #FFFFFF;
-            --grid-border: #333333;
-            --subgrid-border: #555555;
+            
+            /* COULEUR JAUNE FLUO AJOUTÉE ICI */
+            --yellow-neon: #EEFC00;
+            
+            /* COULEURS DES BORDURES MISES À JOUR */
+            --grid-border: var(--yellow-neon); /* Bordure extérieure et des grandes sections */
+            --subgrid-border: #888800; /* Bordure plus foncée pour les lignes intérieures */
+            
             --cell-bg-color: #FAFAFA;
             --fixed-cell-bg: #EBEBEB;
             --keypad-bg: rgba(255, 255, 255, 0.1);
