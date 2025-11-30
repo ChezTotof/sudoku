@@ -6,21 +6,19 @@
     <title>Emoji Sudoku - Classique</title>
     <style>
         /* --- VARIABLES --- */
-        /* --- VARIABLES --- */
-        /* --- VARIABLES --- */
         :root {
             --neon-pink: #FF0099;
-            --neon-blue: #00E0FF;
+            --neon-blue: #00E0FF; /* Bleu électrique pour les contours 3x3 */
             --neon-green: #00FF00;
             --main-text-color: #FFFFFF;
             
-            /* COULEUR JAUNE FLUO AJOUTÉE ICI */
-            --yellow-neon: #EEFC00;
+            /* COULEURS DES BORDURES DE GRILLE DÉFINIES SELON LA DEMANDE */
+            --grid-main-border-color: var(--neon-blue); /* Contour extérieur et lignes 3x3 */
+            --grid-minor-border-color: #EEFC00; /* Lignes fines 1x1 en jaune */
             
-            /* COULEURS DES BORDURES MISES À JOUR */
-            --grid-border: var(--yellow-neon); /* Bordure extérieure et des grandes sections */
-            --subgrid-border: #888800; /* Bordure plus foncée pour les lignes intérieures */
-            
+            /* FOND DE GRILLE NOIR */
+            --grid-background: #000000; 
+
             --cell-bg-color: #FAFAFA;
             --fixed-cell-bg: #EBEBEB;
             --keypad-bg: rgba(255, 255, 255, 0.1);
@@ -38,7 +36,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            /* L'image de fond est retirée ici pour éviter le blocage 404 */
+            /* L'image de fond reste retirée pour éviter le blocage 404 */
         }
 
         /* --- CONTENEURS D'ÉCRAN --- */
@@ -159,19 +157,22 @@
         }
 
 
-        /* --- GRILLE SUDOKU --- */
+        /* --- GRILLE SUDOKU (MISE À JOUR) --- */
         #board {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             gap: 1px;
-            background: var(--grid-border);
-            border: 3px solid var(--grid-border);
+            background: var(--grid-background); /* FOND NOIR ENTRE LES CELLULES */
+            border: 3px solid var(--grid-main-border-color); /* Bordure extérieure en BLEU */
+            
             width: 100%;
-            aspect-ratio: 1; /* Pour que la grille soit toujours carrée */
+            aspect-ratio: 1; 
             margin-bottom: 20px;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            
+            /* EFFET NEON SUR LA GRILLE (BLEU) */
+            box-shadow: 0 0 15px var(--grid-main-border-color); 
         }
 
         .cell {
@@ -194,7 +195,7 @@
         }
 
         .cell.selected {
-            background: rgba(0, 224, 255, 0.3) !important; /* Couleur de sélection néon */
+            background: rgba(0, 224, 255, 0.3) !important; 
         }
         
         .cell.error {
@@ -202,11 +203,18 @@
             animation: shake 0.5s;
         }
 
-        /* Lignes de sous-grille (3x3) */
-        .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border); }
+        /* Lignes des grandes sous-grilles (3x3) - MAINTENANT EN BLEU ÉLECTRIQUE */
+        .cell:nth-child(3n) { border-right: 3px solid var(--grid-main-border-color); }
         .cell:nth-child(9n) { border-right: none; }
         .cell:nth-child(n+19):nth-child(-n+27), 
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--subgrid-border); }
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--grid-main-border-color); }
+        
+        /* Lignes fines intérieures (1x1) - MAINTENANT EN JAUNE FLUO */
+        .cell { border-bottom: 1px solid var(--grid-minor-border-color); }
+        .cell:nth-child(n+73) { border-bottom: none; } /* Enlève la dernière ligne horizontale */
+        .cell:nth-child(9n) { border-right: none !important; } /* S'assurer que le bord droit est bien supprimé */
+        .cell:nth-child(n):not(:nth-child(3n)) { border-right: 1px solid var(--grid-minor-border-color); } /* Petites lignes verticales */
+
 
         /* --- CLAVIER (Keypad) --- */
         #keypad {
@@ -236,8 +244,8 @@
         }
         
         .key.completed {
-            background-color: rgba(0, 255, 0, 0.1); /* Vert très léger */
-            color: rgba(255, 255, 255, 0.5); /* Emoji grisé */
+            background-color: rgba(0, 255, 0, 0.1); 
+            color: rgba(255, 255, 255, 0.5); 
             opacity: 0.6;
             cursor: default;
         }
@@ -256,7 +264,7 @@
 
         /* --- MODALE (Fin de Partie) --- */
         #modal {
-            display: none; /* Caché par défaut */
+            display: none; 
             position: fixed;
             z-index: 10;
             left: 0;
@@ -378,7 +386,6 @@
     let gameOver = false;
     const SAVE_KEY = 'emojiSudokuSave';
     
-    // La logique DAILY_SAVE_KEY_PREFIX est retirée
 
     // --- Générateur de Nombre Pseudo-Aléatoire Déterminé (Seed) ---
     function seededRandom(seed) {
@@ -386,14 +393,11 @@
         return x - Math.floor(x);
     }
     
-    // generateDailySeed et checkDailyChallengeStatus sont retirés
-
     // --- Vérification de sauvegarde au démarrage ---
     window.onload = function() {
         if (localStorage.getItem(SAVE_KEY)) {
             document.getElementById('btn-continue').style.display = 'block';
         }
-        // checkDailyChallengeStatus() est retiré
     };
 
     // --- Logique Sudoku (Génération) ---
@@ -514,8 +518,6 @@
         updateKeypadStatus();
     }
     
-    // startDailyChallenge est retiré
-    
     function startGame(diff) {
         localStorage.removeItem(SAVE_KEY);
         document.getElementById('btn-continue').style.display = 'none';
@@ -545,7 +547,7 @@
         }
     }
 
-    // --- Fonctions d'Interface et de Jeu (Non modifiées) ---
+    // --- Fonctions d'Interface et de Jeu ---
     function updateStatsUI() {
         document.getElementById('mistakes').textContent = `Erreurs: ${mistakes}/${maxMistakes}`;
         document.getElementById('hints').textContent = `Indice: ${hintsUsed}/${maxHints}`;
@@ -626,8 +628,6 @@
         let cell = document.getElementById(`cell-${selectedCellIndex}`);
         let correctVal = solution[selectedCellIndex];
         
-        // isDailyGame est retiré
-
         if (num === 0) { 
             currentBoard[selectedCellIndex] = 0;
             cell.textContent = '';
@@ -679,8 +679,6 @@
            selectCell(targetIdx);
         }
         
-        // isDailyGame est retiré
-
         hintsUsed++;
         let correctVal = solution[targetIdx];
         currentBoard[targetIdx] = correctVal;
@@ -710,8 +708,6 @@
 
     function endGame(win) {
         gameOver = true;
-        
-        // Logique Daily et DailyState retirée
         
         localStorage.removeItem(SAVE_KEY);
         document.getElementById('btn-continue').style.display = 'none';
@@ -743,9 +739,7 @@
     }
 
     function shareOnFacebook() {
-        // Logique DailyState retirée
-        
-        let quote = "Joue à mon Emoji Sudoku !";
+        let quote = "Joue au Sudoku de Totof !";
         
         const url = encodeURIComponent(window.location.href); 
         const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(quote)}`;
