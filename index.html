@@ -2,337 +2,376 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Emoji Sudoku Challenge</title>
-    <meta property="og:title" content="Joue à mon Emoji Sudoku !">
-    <meta property="og:description" content="Peux-tu résoudre ce puzzle ? 3 niveaux de difficulté avec des symboles funs !">
-    <meta property="og:image" content="https://cheztotof.github.io/sudoku/vignette_sudoku.png">
-    <meta property="og:url" content="https://cheztotof.github.io/sudoku/">
-    <meta property="og:type" content="website"> 
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Sudoku - Défi Quotidien</title>
     <style>
-        /* --- THEME FUTURISTE NÉON --- */
-        :root { 
-            --primary-neon-blue: #00e0ff; /* Bleu électrique */
-            --secondary-neon-magenta: #e000ff; /* Magenta vif */
-            --neon-green: #39ff14; /* Vert citron néon */
-            --danger: #ff0077; /* Rose néon pour les erreurs */
-            --text-light: #e0e0e0; /* Texte clair pour fond sombre */
-            --text-dark: #222222; /* Texte sombre (si nécessaire) */
-            --background-dark: #1a1a1d; /* Fond presque noir */
-            --grid-border-neon: #00e0ff; /* Bordure extérieure de grille néon */
-            --subgrid-border-neon: #e000ff; /* Bordures 3x3 de grille néon */
-            --cell-gap-neon: #FFFF00; /* Lignes fines entre cellules (jaune) */
-            --button-glow: 0 0 8px rgba(0, 224, 255, 0.6), 0 0 16px rgba(0, 224, 255, 0.4);
-            --button-glow-hover: 0 0 10px rgba(0, 224, 255, 0.8), 0 0 20px rgba(0, 224, 255, 0.6);
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: var(--background-dark); /* Fond sombre */
-            color: var(--text-light); /* Texte clair */
-            display: flex; flex-direction: column; align-items: center; 
-            margin: 0; padding: 10px; min-height: 100vh;
-        }
-        
-        h1 { 
-            margin: 10px 0; font-size: 2.5rem; 
-            color: var(--primary-neon-blue); /* Titre néon */
-            text-shadow: 0 0 10px var(--primary-neon-blue), 0 0 20px var(--primary-neon-blue); /* Effet de lueur */
-            letter-spacing: 2px;
-        }
-        p { font-size: 1.1rem; color: var(--text-light); }
-
-        /* Conteneurs pour le thème néon */
-        .container-box {
-            background: rgba(30, 30, 35, 0.8); /* Fond sombre semi-transparent */
-            padding: 25px;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 0 15px rgba(0, 224, 255, 0.3); /* Lueur néon légère */
-            text-align: center;
-            border: 1px solid var(--primary-neon-blue); /* Bordure fine néon */
+        /* --- VARIABLES --- */
+        :root {
+            --neon-pink: #FF0099;
+            --neon-blue: #00E0FF;
+            --neon-green: #00FF00;
+            --main-text-color: #FFFFFF;
+            --grid-border: #333333;
+            --subgrid-border: #555555;
+            --cell-bg-color: #FAFAFA;
+            --fixed-cell-bg: #EBEBEB;
+            --keypad-bg: rgba(255, 255, 255, 0.1);
         }
 
-        /* Menu Start */
-        #start-screen { display: flex; flex-direction: column; gap: 15px; margin-top: 50px; }
-        .btn { 
-            padding: 12px 24px; font-size: 1.2rem; border: none; border-radius: 8px; 
-            cursor: pointer; color: var(--text-light); transition: transform 0.2s, box-shadow 0.2s; 
-            font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.7); 
-            background: rgba(0, 224, 255, 0.2); /* Fond semi-transparent néon */
-            border: 2px solid var(--primary-neon-blue); /* Bordure néon */
-            box-shadow: var(--button-glow);
-        }
-        .btn:active { transform: scale(0.95); box-shadow: none; }
-        .btn:hover { box-shadow: var(--button-glow-hover); filter: brightness(1.2); }
-        
-        /* Bouton Continuer (Spécial) */
-        #btn-continue { 
-            background: linear-gradient(45deg, #00e0ff, #e000ff); /* Dégradé néon */
-            border: 2px solid var(--neon-green); 
-            display: none; /* Caché par défaut */
-            animation: pulse-neon 2s infinite;
-            box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
-        }
-
-        /* NOUVEAU STYLE : Bouton Défi Quotidien Complété */
-        .btn.completed {
-            background: #555555 !important;
-            border-color: #888888 !important;
-            box-shadow: none !important;
-            opacity: 0.6;
-            cursor: default;
-            pointer-events: none; /* Rendre le bouton non cliquable */
-        }
-
-        .btn-easy { 
-            background: linear-gradient(45deg, #00e0ff, #00ffc4); 
-            border: 2px solid #00ffc4;
-            box-shadow: 0 0 8px rgba(0,255,196,0.6);
-        }
-        .btn-medium { 
-            background: linear-gradient(45deg, #e000ff, #ff00ea); 
-            border: 2px solid #ff00ea;
-            box-shadow: 0 0 8px rgba(255,0,234,0.6);
-        }
-        .btn-hard { 
-            background: linear-gradient(45deg, #ff0077, #ff00ea); 
-            border: 2px solid #ff0077;
-            box-shadow: 0 0 8px rgba(255,0,119,0.6);
-        }
-        .btn-action { 
-            background: rgba(0, 224, 255, 0.2); 
-            border: 1px solid var(--primary-neon-blue); 
-            color: var(--primary-neon-blue); /* Texte bouton action en néon */
-            font-size: 1rem; padding: 10px 16px; margin: 5px; 
-            box-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
-        }
-        .btn-action:hover {
-            box-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
-            filter: brightness(1.2);
-        }
-        
-        @keyframes pulse-neon {
-            0% { transform: scale(1); box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
-            50% { transform: scale(1.05); box-shadow: 0 0 15px var(--neon-green), 0 0 25px var(--neon-green), 0 0 40px var(--neon-green); }
-            100% { transform: scale(1); box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
-        }
-
-        /* Game Board */
-        #game-screen { 
-            display: none; flex-direction: column; align-items: center; width: 100%; max-width: 500px; margin-top: 20px;
-            /* 🍔🍟 FOND D'ÉCRAN BURGER/FRITES (conserve l'image) 🍟🍔 */
-            background: url('burger_frites-removebg-preview-removebg-preview.png') no-repeat center bottom; 
-            background-size: 100% auto; 
-            min-height: 80vh; 
-            border-radius: 15px; 
+        /* --- STYLES GÉNÉRAUX --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            color: var(--main-text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 224, 255, 0.4); /* Lueur autour de l'écran de jeu */
+            box-sizing: border-box;
+            background-image: url('burger_frites-removebg-preview-removebg-preview.png'); /* Assurez-vous que le chemin est correct */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
-        /* 💡 NOUVEAU STYLE: FOND SEMI-TRANSPARENT pour la lisibilité sur l'image */
-        #game-content-overlay {
-            background: rgba(10, 10, 15, 0.85); /* Fond très sombre opaque à 85% */
+        /* --- CONTENEURS D'ÉCRAN --- */
+        #start-screen, #game-screen {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px var(--neon-blue);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-screen {
+            display: none; /* Caché par défaut */
+        }
+
+        /* --- TITRE --- */
+        h1 {
+            font-size: 3em;
+            text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--neon-green);
+            padding-bottom: 10px;
+        }
+
+        /* --- BOUTONS --- */
+        .btn {
+            padding: 15px 30px;
+            margin: 10px 0;
+            border: none;
             border-radius: 10px;
-            padding: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
             width: 100%;
-            box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
-            border: 1px solid var(--primary-neon-blue);
+            max-width: 300px;
         }
 
-        .stats { 
-            display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px; 
-            font-weight: bold; text-shadow: 0 0 5px var(--primary-neon-blue); 
-            padding: 0 10px; color: var(--text-light);
-            font-size: 1.2rem;
+        .btn:hover:not(:disabled) {
+            transform: scale(1.05);
         }
         
-        #board { 
-            display: grid; grid-template-columns: repeat(9, 1fr); 
-            gap: 1px; background: var(--cell-gap-neon); /* Lignes fines entre cellules */
-            border: 3px solid var(--grid-border-neon); /* Bordure extérieure néon */
-            width: 100%; aspect-ratio: 1; margin-bottom: 20px;
-            border-radius: 8px; overflow: hidden;
-            box-shadow: 0 0 15px var(--primary-neon-blue), 0 0 25px rgba(0, 224, 255, 0.3); /* Lueur de la grille */
+        /* Styles de couleur pour les boutons de difficulté */
+        .btn-daily {
+             background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+             color: #FFFFFF;
+             box-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-blue);
+        }
+
+        .btn-easy {
+            background-color: var(--neon-green);
+            color: #000000;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .btn-medium {
+            background-color: var(--neon-pink);
+            color: #FFFFFF;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .btn-hard {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            box-shadow: 0 0 10px #FF0000;
         }
         
-        .cell { 
-            background: #2a2a2e; /* Fond des cellules en gris très foncé */
-            color: var(--text-light); /* Texte des emojis en clair */
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.8rem; cursor: pointer; user-select: none;
-            transition: background 0.2s, box-shadow 0.2s;
+        .btn-daily.completed {
+            background: #555555;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: #AAAAAA;
         }
         
-        .cell.selected { 
-            /* JAUNE VIF (Rétablit la couleur claire demandée) */
-            background: #FFD700 !important; 
-            color: var(--text-dark) !important; /* Force le texte des emojis à être sombre sur le fond clair */
-            /* Suppression des effets néon pour une meilleure visibilité */
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8), inset 0 0 5px rgba(255, 215, 0, 0.5); 
+        .btn-continue {
+            display: none; /* Géré par JS */
+            background-color: #FFC300;
+            color: #333333;
+            box-shadow: 0 0 10px #FFC300;
+        }
+
+        /* --- AFFICHAGE STATISTIQUES ET CONTRÔLES --- */
+        #stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
         }
         
-        .cell.fixed { 
-            background: #1e1e22; /* Fond des cellules fixes encore plus foncé */
-            color: #888888; /* Texte des emojis fixes en gris */
-            cursor: default; 
+        #btn-hint, #btn-restart, #btn-home, #btn-facebook {
+            padding: 10px 15px;
+            font-size: 1em;
+            margin: 5px;
+            border-radius: 8px;
+            transition: opacity 0.3s;
         }
         
-        .cell.error { 
-            background: rgba(255, 0, 119, 0.6) !important; /* Rose néon pour les erreurs */
-            box-shadow: 0 0 10px var(--danger), inset 0 0 5px var(--danger);
+        #btn-hint {
+            background-color: var(--neon-blue);
+            color: #FFFFFF;
+            box-shadow: 0 0 8px var(--neon-blue);
+        }
+
+        #btn-home, #btn-restart {
+            background-color: #555555;
+            color: #FFFFFF;
         }
         
-        /* Bordures de sous-grille néon */
-        .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border-neon); }
+        #btn-facebook {
+            background-color: #1877F2;
+            color: white;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+
+        /* --- GRILLE SUDOKU --- */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 1px;
+            background: var(--grid-border);
+            border: 3px solid var(--grid-border);
+            width: 100%;
+            aspect-ratio: 1; /* Pour que la grille soit toujours carrée */
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .cell {
+            background: var(--cell-bg-color);
+            color: #333333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .cell.fixed {
+            background: var(--fixed-cell-bg);
+            color: #555555;
+            cursor: default;
+            font-weight: bold;
+        }
+
+        .cell.selected {
+            background: rgba(0, 224, 255, 0.3) !important; /* Couleur de sélection néon */
+        }
+        
+        .cell.error {
+            background: rgba(244, 67, 54, 0.6) !important;
+            animation: shake 0.5s;
+        }
+
+        /* Lignes de sous-grille (3x3) */
+        .cell:nth-child(3n) { border-right: 3px solid var(--subgrid-border); }
         .cell:nth-child(9n) { border-right: none; }
         .cell:nth-child(n+19):nth-child(-n+27), 
-        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--subgrid-border-neon); }
+        .cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 3px solid var(--subgrid-border); }
 
-        /* --- Animation de Victoire NÉON --- */
-        @keyframes victory-shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            25% { transform: translate(-1px, -2px) rotate(-0.5deg); }
-            50% { transform: translate(1px, -1px) rotate(0.5deg); }
-            75% { transform: translate(-1px, 2px) rotate(-0.5deg); }
-            100% { transform: translate(1px, 1px) rotate(0deg); }
+        /* --- CLAVIER (Keypad) --- */
+        #keypad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 500px;
+            padding: 10px 0;
         }
 
-        @keyframes victory-glow {
-            0%, 100% { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
-            50% { box-shadow: 0 0 30px var(--neon-green), 0 0 50px var(--neon-green), 0 0 70px rgba(57, 255, 20, 0.5); }
+        .key {
+            background: var(--keypad-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 1.8rem;
+            padding: 10px 0;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.1s, transform 0.1s;
+        }
+
+        .key:hover:not(.completed) {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .key.completed {
+            background-color: rgba(0, 255, 0, 0.1); /* Vert très léger */
+            color: rgba(255, 255, 255, 0.5); /* Emoji grisé */
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        /* Bouton de suppression */
+        .key.delete {
+            background-color: #555555;
+            color: #FFFFFF;
+            font-size: 1em;
+            line-height: 1.4;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- MODALE (Fin de Partie) --- */
+        #modal {
+            display: none; /* Caché par défaut */
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            margin: 15% auto;
+            padding: 40px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px var(--neon-pink);
+            animation: fadeIn 0.5s;
+        }
+
+        #modal-title {
+            font-size: 2em;
+            color: var(--neon-pink);
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        #modal-msg {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes victoryGlow {
+            0% { box-shadow: 0 0 10px var(--neon-green); }
+            50% { box-shadow: 0 0 40px var(--neon-green); }
+            100% { box-shadow: 0 0 10px var(--neon-green); }
         }
 
         .victory-animation {
-            animation: victory-shake 0.2s ease-in-out 3, victory-glow 0.8s infinite alternate;
-            border-color: var(--neon-green) !important;
-        }
-
-        /* Controls */
-        #keypad { 
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; 
-            padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; 
-            border: 1px solid var(--secondary-neon-magenta);
-            box-shadow: 0 0 10px rgba(224, 0, 255, 0.3);
-        }
-        .key { 
-            background: rgba(224, 0, 255, 0.1); border: 1px solid var(--secondary-neon-magenta); 
-            color: var(--secondary-neon-magenta); /* Couleurs des touches en magenta */
-            border-radius: 8px; font-size: 1.8rem; padding: 10px 0; cursor: pointer; text-align: center; 
-            transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 0 5px rgba(224, 0, 255, 0.4);
-        }
-        .key:hover { 
-            background: rgba(224, 0, 255, 0.2); 
-            box-shadow: 0 0 10px rgba(224, 0, 255, 0.7);
-        }
-        .key:active { background: var(--secondary-neon-magenta); color: var(--text-dark); box-shadow: none;}
-        
-        .key.completed {
-            opacity: 0.3;
-            background: #333333;
-            color: #666666;
-            cursor: default;
-            pointer-events: none;
-            border-color: #555555;
-            box-shadow: none;
-        }
-        
-        #controls { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; width: 100%; }
-        
-        /* Modal */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; z-index: 100; }
-        .modal-content { 
-            background: var(--background-dark); 
-            color: var(--text-light);
-            border: 1px solid var(--primary-neon-blue); 
-            box-shadow: 0 0 20px var(--primary-neon-blue);
-        }
-        .modal-content h2 { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
-        .modal-content p { color: var(--text-light); }
-        
-        .fb-btn { 
-            margin-top:20px; 
-            background: #1877F2; 
-            width: 100%; font-weight: bold; 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            border: 2px solid #00e0ff; /* Bordure néon pour bouton FB */
-            box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
-        }
-        .fb-btn:hover {
-            box-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
-        }
-
-        /* Style des boutons de la modale */
-        .modal-actions {
-            display: flex;
-            justify-content: space-around;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .modal-actions .btn {
-            flex-grow: 1;
-        }
-        .modal-actions .btn:first-child { /* Bouton Rejouer */
-            background: linear-gradient(45deg, #00e0ff, #00ffc4);
-            border-color: #00ffc4;
-            box-shadow: 0 0 8px rgba(0,255,196,0.6);
-        }
-        .modal-actions .btn:last-child { /* Bouton Accueil */
-            background: linear-gradient(45deg, #e000ff, #ff00ea);
-            border-color: #ff00ea;
-            box-shadow: 0 0 8px rgba(255,0,234,0.6);
+            animation: victoryGlow 1.5s infinite alternate;
         }
     </style>
 </head>
 <body>
 
-    <div id="start-screen" class="container-box">
+    <div id="start-screen">
         <h1>Emoji Sudoku 🧩</h1>
+        <button id="btn-daily" class="btn btn-medium btn-daily" onclick="startDailyChallenge()">Défi Quotidien 🆕</button>
         
-        <button id="btn-continue" class="btn" onclick="continueGame()">▶ Continuer la partie</button>
+        <button id="btn-continue" class="btn btn-medium btn-continue" onclick="continueGame()">Continuer la partie</button>
+        
+        <p>Choisis ton niveau pour commencer :</p>
 
-        <button id="btn-daily" class="btn btn-medium" onclick="startDailyChallenge()">Défi Quotidien 🆕</button>
-        
-        <p style="color:#666">Choisis ton niveau pour commencer :</p>
         <button class="btn btn-easy" onclick="startGame('easy')">Facile (Débutant)</button>
         <button class="btn btn-medium" onclick="startGame('medium')">Moyen (Habitué)</button>
         <button class="btn btn-hard" onclick="startGame('hard')">Difficile (Expert)</button>
+        
+        <p style="margin-top: 25px; font-size: 0.9em;">Créé par ChezTotof</p>
     </div>
 
     <div id="game-screen">
-        <div id="game-content-overlay"> 
-            <div class="stats">
-                <span id="mistakes">Erreurs: 0/3</span>
-                <span id="hints">Indice: 0/3</span>
+        <div id="stats">
+            <span id="mistakes">Erreurs: 0/3</span>
+            <span id="hints">Indice: 0/3</span>
+        </div>
+        
+        <div id="board">
             </div>
-            
-            <div id="board"></div>
+        
+        <div id="keypad">
+            <div class="key delete" onclick="inputNumber(0)">Effacer</div>
+        </div>
 
-            <div id="keypad">
-                </div>
-
-            <div id="controls">
-                <button class="btn btn-action" onclick="useHint()" id="btn-hint">Indice 💡</button>
-                <button class="btn btn-action" onclick="goToStartScreen()">Accueil 🏠</button>
-            </div>
-            <button class="btn btn-action fb-btn" onclick="shareOnFacebook()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/></svg>
-                Partager sur Facebook
-            </button>
-        </div> </div>
+        <div id="controls">
+            <button id="btn-hint" class="btn" onclick="useHint()">Indice 💡</button>
+            <button id="btn-home" class="btn" onclick="goToStartScreen()">Accueil 🏠</button>
+        </div>
+        
+        <button id="btn-facebook" class="btn" onclick="shareOnFacebook()">
+            <span style="font-size: 1.1em;">f</span> Partager sur Facebook
+        </button>
+    </div>
 
     <div id="modal">
-        <div class="modal-content container-box">
-            <h2 id="modal-title" style="font-size: 2rem; margin-bottom: 10px;"></h2>
-            <p id="modal-msg" style="font-size: 1.2rem; margin-bottom: 25px;"></p>
-            <div class="modal-actions">
-                <button class="btn btn-action" style="background: #4caf50; font-size: 1.2rem; padding: 15px 30px;" onclick="restartGame()">Rejouer</button>
-                <button class="btn btn-action" style="background: #03a9f4; font-size: 1.2rem; padding: 15px 30px;" onclick="goToStartScreen()">Accueil 🏠</button>
-            </div>
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-msg"></p>
+            <button class="btn btn-easy" onclick="goToStartScreen()">Retour à l'accueil</button>
         </div>
     </div>
+
 
 <script>
     // --- Configuration & Variables ---
@@ -376,18 +415,35 @@
         }
 
         // 2. Vérification de la partie quotidienne terminée
-        const dailySeed = generateDailySeed();
-        const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        if (localStorage.getItem(dailyKey) && JSON.parse(localStorage.getItem(dailyKey)).isComplete) {
-            document.getElementById('btn-daily').textContent = "Défi Quotidien ✅";
-            document.getElementById('btn-daily').disabled = true;
-            document.getElementById('btn-daily').classList.add('completed');
-        } else {
-            document.getElementById('btn-daily').textContent = "Défi Quotidien 🆕";
-            document.getElementById('btn-daily').disabled = false;
-            document.getElementById('btn-daily').classList.remove('completed');
-        }
+        checkDailyChallengeStatus();
     };
+    
+    function checkDailyChallengeStatus() {
+         const dailySeed = generateDailySeed();
+         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
+         const dailyButton = document.getElementById('btn-daily');
+         
+         if (localStorage.getItem(dailyKey)) {
+             const savedDailyState = JSON.parse(localStorage.getItem(dailyKey));
+             
+             if (savedDailyState.isComplete) {
+                dailyButton.textContent = "Défi Quotidien ✅";
+                dailyButton.disabled = true;
+                dailyButton.classList.add('completed');
+             } else {
+                 // Partie quotidienne en cours
+                dailyButton.textContent = "Défi Quotidien (En Cours)";
+                dailyButton.disabled = false;
+                dailyButton.classList.remove('completed');
+             }
+         } else {
+             // Nouvelle partie quotidienne disponible
+             dailyButton.textContent = "Défi Quotidien 🆕";
+             dailyButton.disabled = false;
+             dailyButton.classList.remove('completed');
+         }
+    }
+
 
     // --- Logique Sudoku (Génération) ---
     function isValid(board, row, col, num) {
@@ -466,7 +522,6 @@
             mistakes: mistakes,
             hintsUsed: hintsUsed,
             isComplete: false,
-            // Seulement stocké pour les daily games
             difficulty: isDaily ? 'daily' : null 
         };
         
@@ -490,10 +545,20 @@
         mistakes = state.mistakes;
         hintsUsed = state.hintsUsed;
         
+        // On s'assure qu'on ne continue pas une partie quotidienne par erreur
+        const dailySeed = generateDailySeed();
+        const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
+        localStorage.removeItem(dailyKey); // Supprime toute référence à une ancienne partie quotidienne
+
+        // Lancer l'interface
+        setupGameScreen();
+    }
+
+    // Fonction commune pour démarrer l'interface de jeu
+    function setupGameScreen() {
         gameOver = false;
         selectedCellIndex = -1;
 
-        // Lancer l'interface
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-screen').style.display = 'flex';
         document.getElementById('modal').style.display = 'none';
@@ -503,7 +568,7 @@
         renderKeypad();
         updateKeypadStatus();
     }
-
+    
     // --- Fonctions de Démarrage ---
     
     // Fonction pour démarrer le défi quotidien
@@ -539,15 +604,7 @@
         }
         
         // Initialisation de l'interface pour le défi
-        gameOver = false;
-        selectedCellIndex = -1;
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'flex';
-        
-        updateStatsUI();
-        renderBoard();
-        renderKeypad();
-        updateKeypadStatus();
+        setupGameScreen();
     }
     
     // Fonction pour démarrer une nouvelle partie (non-quotidienne)
@@ -556,39 +613,23 @@
         localStorage.removeItem(SAVE_KEY);
         document.getElementById('btn-continue').style.display = 'none';
 
-        // Efface l'ancienne sauvegarde du défi quotidien pour ne pas la confondre
+        // Efface l'ancienne sauvegarde du défi quotidien (on ne veut pas de conflit)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        if(localStorage.getItem(dailyKey) && !JSON.parse(localStorage.getItem(dailyKey)).isComplete) {
-            // Si une partie quotidienne est en cours, on la supprime pour lancer la partie normale
-            localStorage.removeItem(dailyKey);
-        }
+        localStorage.removeItem(dailyKey);
 
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'flex';
-        
         mistakes = 0;
         hintsUsed = 0;
-        gameOver = false;
-        selectedCellIndex = -1;
-        updateStatsUI();
-
         // Génère une grille normale (sans seed spécifique)
         let matrix = generateBoard(diff);
         initialBoard = matrix.flat(); 
         solution = solution.flat();
         currentBoard = [...initialBoard];
         
-        renderBoard();
-        renderKeypad();
-        updateKeypadStatus();
+        setupGameScreen();
         saveGame(false); // Sauvegarde initiale de la partie normale
     }
     
-    function restartGame() {
-         location.reload();
-    }
-
     function goToStartScreen() {
         gameOver = false;
         selectedCellIndex = -1;
@@ -596,23 +637,14 @@
         document.getElementById('start-screen').style.display = 'flex';
         document.getElementById('modal').style.display = 'none';
         
-        // Vérifie s'il y a une sauvegarde pour afficher le bouton
+        // Mise à jour de l'état des boutons au retour à l'accueil
         if (localStorage.getItem(SAVE_KEY)) {
             document.getElementById('btn-continue').style.display = 'block';
+        } else {
+             document.getElementById('btn-continue').style.display = 'none';
         }
         
-        // Mise à jour de l'état du bouton Daily Challenge au retour à l'accueil
-        const dailySeed = generateDailySeed();
-        const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        if (localStorage.getItem(dailyKey) && JSON.parse(localStorage.getItem(dailyKey)).isComplete) {
-            document.getElementById('btn-daily').textContent = "Défi Quotidien ✅";
-            document.getElementById('btn-daily').disabled = true;
-            document.getElementById('btn-daily').classList.add('completed');
-        } else {
-            document.getElementById('btn-daily').textContent = "Défi Quotidien 🆕";
-            document.getElementById('btn-daily').disabled = false;
-            document.getElementById('btn-daily').classList.remove('completed');
-        }
+        checkDailyChallengeStatus();
     }
 
     function updateStatsUI() {
@@ -643,6 +675,9 @@
 
     function renderKeypad() {
         const kp = document.getElementById('keypad');
+        // On garde le bouton effacer pour le remettre à la fin
+        const deleteButtonHTML = kp.querySelector('.delete') ? kp.querySelector('.delete').outerHTML : `<div class="key delete" onclick="inputNumber(0)">Effacer</div>`;
+        
         kp.innerHTML = ''; 
         emojis.forEach((emoji, idx) => {
             let btn = document.createElement('div');
@@ -652,6 +687,9 @@
             btn.onclick = (e) => { e.stopPropagation(); inputNumber(idx + 1); };
             kp.appendChild(btn);
         });
+        
+        // Ajout du bouton Effacer
+        kp.insertAdjacentHTML('beforeend', deleteButtonHTML);
     }
 
     function updateKeypadStatus() {
@@ -674,10 +712,10 @@
 
     function selectCell(idx) {
         if (gameOver) return;
-        // La cellule fixe (initialBoard[idx] !== 0) ne peut pas être sélectionnée pour la modification
+        // La cellule fixe ne peut pas être sélectionnée
         if (initialBoard[idx] !== 0) {
             if (selectedCellIndex !== -1) document.getElementById(`cell-${selectedCellIndex}`).classList.remove('selected');
-            selectedCellIndex = -1; // Ne rien sélectionner
+            selectedCellIndex = -1; 
             return;
         }
 
@@ -692,14 +730,20 @@
         let cell = document.getElementById(`cell-${selectedCellIndex}`);
         let correctVal = solution[selectedCellIndex];
         
-        // Déterminer quelle clé de sauvegarde utiliser (normale ou quotidienne)
+        // Déterminer la clé de sauvegarde (normale ou quotidienne)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        // On vérifie si une partie quotidienne est active et non complétée
-        const isDailyGame = localStorage.getItem(dailyKey) !== null 
-                            && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily' 
-                            && JSON.parse(localStorage.getItem(dailyKey)).isComplete === false;
+        const isDailyGame = localStorage.getItem(dailyKey) !== null && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily';
 
+        if (num === 0) { // Clic sur "Effacer"
+            currentBoard[selectedCellIndex] = 0;
+            cell.textContent = '';
+            cell.classList.remove('selected');
+            selectedCellIndex = -1;
+            saveGame(isDailyGame);
+            updateKeypadStatus();
+            return;
+        }
 
         if (num !== correctVal) {
             mistakes++;
@@ -707,14 +751,12 @@
             saveGame(isDailyGame); 
 
             // LOGIQUE d'erreur : Affiche l'emoji Vertige
-            const previousContent = cell.textContent;
-            cell.textContent = '😵‍💫'; // Emoji Vertige
+            cell.textContent = '😵‍💫'; 
             cell.classList.add('error');
             
             setTimeout(() => {
                 if (!gameOver) {
                     cell.classList.remove('error');
-                    // Réaffiche l'ancien contenu (s'il y en avait)
                     cell.textContent = currentBoard[selectedCellIndex] !== 0 
                                        ? emojis[currentBoard[selectedCellIndex] - 1] 
                                        : '';
@@ -729,7 +771,7 @@
             selectedCellIndex = -1;
             
             updateKeypadStatus();
-            saveGame(isDailyGame); // Sauvegarde le coup (normale ou quotidienne)
+            saveGame(isDailyGame); 
             checkWin();
         }
     }
@@ -739,18 +781,16 @@
         
         let targetIdx = selectedCellIndex;
         if (targetIdx === -1 || currentBoard[targetIdx] !== 0) {
-           let emptyIndices = currentBoard.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null);
+           let emptyIndices = currentBoard.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null && initialBoard[idx] === 0);
            if (emptyIndices.length === 0) return;
            targetIdx = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
            selectCell(targetIdx);
         }
         
-        // Déterminer quelle clé de sauvegarde utiliser
+        // Déterminer la clé de sauvegarde (normale ou quotidienne)
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
-        const isDailyGame = localStorage.getItem(dailyKey) !== null 
-                            && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily'
-                            && JSON.parse(localStorage.getItem(dailyKey)).isComplete === false;
+        const isDailyGame = localStorage.getItem(dailyKey) !== null && JSON.parse(localStorage.getItem(dailyKey)).difficulty === 'daily';
 
         hintsUsed++;
         let correctVal = solution[targetIdx];
@@ -760,15 +800,18 @@
         
         cell.style.transition = "all 0.3s";
         cell.style.transform = "scale(1.2)";
-        cell.style.background = "rgba(0, 224, 255, 0.3)"; // Utilisation de la couleur néon pour l'indice
+        cell.style.background = "rgba(0, 224, 255, 0.3)"; // Couleur néon pour l'indice
         setTimeout(() => {
              cell.style.transform = "scale(1)";
              cell.style.background = "";
+             cell.classList.remove('selected');
+             selectedCellIndex = -1;
+             renderBoard(); // Force un re-rendu pour réappliquer les styles de grille
         }, 300);
 
         updateStatsUI();
         updateKeypadStatus();
-        saveGame(isDailyGame); // Sauvegarde l'indice
+        saveGame(isDailyGame);
         checkWin();
     }
 
@@ -808,21 +851,19 @@
         // --- Gérer l'animation de victoire ---
         if (win) {
             const boardDiv = document.getElementById('board');
-            boardDiv.classList.add('victory-animation'); // Ajout de la classe d'animation
+            boardDiv.classList.add('victory-animation'); 
             
-            // Retirer l'animation après un court délai pour que la grille soit normale sur la modale
             setTimeout(() => {
                 boardDiv.classList.remove('victory-animation');
-            }, 1500); // 1.5 seconde d'animation
+            }, 1500); 
         }
-        // --- FIN GESTION ANIMATION ---
 
         setTimeout(() => {
             modal.style.display = 'flex';
             if (win) {
                 title.innerHTML = "🎉 Victoire ! 🎉";
                 msg.textContent = isDailyGame 
-                                  ? `Défi Quotidien terminé en ${mistakes} erreurs !`
+                                  ? `Défi Quotidien terminé avec ${mistakes} erreurs et ${hintsUsed} indices !`
                                   : "Bravo, tu as résolu le Emoji Sudoku !";
             } else {
                 title.innerHTML = "☠️ Game Over ☠️";
@@ -830,20 +871,29 @@
             }
             
             // Met à jour le bouton Défi Quotidien s'il a été complété
-            if (isDailyGame && win) {
-                document.getElementById('btn-daily').textContent = "Défi Quotidien ✅";
-                document.getElementById('btn-daily').disabled = true;
-                document.getElementById('btn-daily').classList.add('completed');
+            if (isDailyGame) {
+               checkDailyChallengeStatus();
             }
         }, 500);
     }
 
     function shareOnFacebook() {
+        // Le message doit être pertinent pour le défi quotidien si c'est le cas
+        const dailySeed = generateDailySeed();
+        const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
+        const dailyState = localStorage.getItem(dailyKey) ? JSON.parse(localStorage.getItem(dailyKey)) : null;
+        
+        let quote = "Joue à mon Emoji Sudoku !";
+        if (dailyState && dailyState.isComplete) {
+            quote = `J'ai terminé le Défi Quotidien en ${dailyState.mistakes} erreurs et ${dailyState.hintsUsed} indices ! Peux-tu faire mieux ?`;
+        }
+        
         const url = encodeURIComponent(window.location.href); 
-        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(quote)}`;
         window.open(shareUrl, '_blank'); 
         return false;
     }
 </script>
+
 </body>
 </html>
