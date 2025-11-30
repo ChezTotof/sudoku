@@ -19,16 +19,23 @@
         }
 
         /* --- STYLES GÉNÉRAUX --- */
-        /* ... (lignes non pertinentes) ... */
-body {
-    /* ... (lignes non pertinentes) ... */
-    box-sizing: border-box;
-    /* L'image de fond dépend de votre fichier 'burger_frites-removebg-preview-removebg-preview.png' */
-    /* background-image: url('burger_frites-removebg-preview-removebg-preview.png'); */
-    /* background-size: cover; */
-    /* background-position: center; */
-    /* background-attachment: fixed; */
-}
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000000;
+            color: var(--main-text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            /* LIGNES DE L'IMAGE DE FOND COMMENTÉES POUR ÉVITER LE BLOCAGE 404 */
+            /* background-image: url('burger_frites-removebg-preview-removebg-preview.png'); */ 
+            /* background-size: cover; */
+            /* background-position: center; */
+            /* background-attachment: fixed; */
+        }
 
         /* --- CONTENEURS D'ÉCRAN --- */
         #start-screen, #game-screen {
@@ -322,7 +329,8 @@ body {
 
     <div id="start-screen">
         <h1>Emoji Sudoku 🧩</h1>
-        <button id="btn-daily" class="btn btn-medium btn-daily" onclick="startDailyChallenge()">Défi Quotidien 🆕</button>
+        
+        <button id="btn-daily" class="btn btn-medium btn-daily">Défi Quotidien 🆕</button>
         
         <button id="btn-continue" class="btn btn-medium btn-continue" onclick="continueGame()">Continuer la partie</button>
         
@@ -440,7 +448,7 @@ body {
         return true;
     }
 
-    // MODIFIÉ pour éviter la boucle infinie et le blocage du navigateur
+    // Fonction solveSudoku MODIFIÉE pour éviter la boucle infinie et le blocage du navigateur
     function solveSudoku(board, randomFunc, attempts = 0, limit = 50000) {
         // Limite de sécurité pour empêcher le blocage
         if (attempts > limit) return false; 
@@ -463,7 +471,7 @@ body {
                 }
             }
         }
-        return true;
+        return true; 
     }
 
     function generateBoard(difficulty, seed = null) {
@@ -477,11 +485,9 @@ body {
             randomGenerator = Math.random;
         }
 
-        // Utilise la fonction solveSudoku modifiée (avec limite)
         const result = solveSudoku(board, randomGenerator);
         if (!result) {
             console.error("Échec critique : Le Sudoku n'a pas pu être résolu.");
-            // En cas d'échec, retourne une grille vide pour éviter un blocage total
             return Array.from({ length: 9 }, () => Array(9).fill(0));
         }
 
@@ -509,7 +515,7 @@ body {
         return board;
     }
 
-    // --- Fonctions de Sauvegarde ---
+    // --- Fonctions de Sauvegarde et Démarrage ---
     function saveGame(isDaily = false) {
         const gameState = {
             solution: solution,
@@ -562,8 +568,7 @@ body {
         updateKeypadStatus();
     }
     
-    // --- Fonctions de Démarrage ---
-    
+    // Fonction appelée par l'écouteur d'événement
     function startDailyChallenge() {
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
@@ -629,6 +634,7 @@ body {
         checkDailyChallengeStatus();
     }
 
+    // --- Fonctions d'Interface et de Jeu (Non modifiées) ---
     function updateStatsUI() {
         document.getElementById('mistakes').textContent = `Erreurs: ${mistakes}/${maxMistakes}`;
         document.getElementById('hints').textContent = `Indice: ${hintsUsed}/${maxHints}`;
@@ -863,6 +869,15 @@ body {
         window.open(shareUrl, '_blank'); 
         return false;
     }
+    
+    // --- CONNEXION DU BOUTON (Solution robuste) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const dailyButton = document.getElementById('btn-daily');
+        if (dailyButton) {
+            dailyButton.addEventListener('click', startDailyChallenge);
+        }
+    });
+
 </script>
 
 </body>
