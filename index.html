@@ -560,9 +560,7 @@
         const dailySeed = generateDailySeed();
         const dailyKey = DAILY_SAVE_KEY_PREFIX + dailySeed;
         if(localStorage.getItem(dailyKey) && !JSON.parse(localStorage.getItem(dailyKey)).isComplete) {
-            // S'il y a une partie quotidienne en cours, on la supprime si on lance une partie normale
-            // Alternative: empêcher de jouer une partie normale si une quotidienne est en cours.
-            // Pour l'instant, on suppose que l'utilisateur veut jouer la partie normale.
+            // Si une partie quotidienne est en cours, on la supprime pour lancer la partie normale
             localStorage.removeItem(dailyKey);
         }
 
