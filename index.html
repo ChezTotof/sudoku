@@ -6,21 +6,27 @@
     <title>Emoji Sudoku - Classique</title>
     <style>
         /* --- VARIABLES --- */
+        /* --- VARIABLES --- */
         :root {
             --neon-pink: #FF0099;
-            --neon-blue: #00E0FF; /* Bleu électrique pour les contours 3x3 */
+            --neon-blue: #00E0FF; 
             --neon-green: #00FF00;
             --main-text-color: #FFFFFF;
             
-            /* COULEURS DES BORDURES DE GRILLE DÉFINIES SELON LA DEMANDE */
-            --grid-main-border-color: var(--neon-blue); /* Contour extérieur et lignes 3x3 */
-            --grid-minor-border-color: #EEFC00; /* Lignes fines 1x1 en jaune */
-            
-            /* FOND DE GRILLE NOIR */
-            --grid-background: #000000; 
+            /* COULEURS DES BORDURES DE GRILLE (RESTENT BLEU/JAUNE) */
+            --grid-main-border-color: var(--neon-blue);
+            --grid-minor-border-color: #EEFC00; 
+            --grid-background: #000000;
 
-            --cell-bg-color: #FAFAFA;
-            --fixed-cell-bg: #EBEBEB;
+            /* COULEURS DES CELLULES (MODIFIÉES) */
+            --cell-bg-color: #000000; /* Fond des cellules en NOIR */
+            --fixed-cell-bg: #111111; /* Cellules initiales en Gris très foncé */
+            --cell-text-color: #FFFFFF; /* Couleur du texte principal en Blanc */
+            --cell-fixed-text-color: #AAAAAA; /* Couleur du texte fixe en Gris clair */
+            
+            --cell-selected-bg: rgba(238, 252, 0, 0.5); /* Sélection en JAUNE FLUORO translucide */
+            --cell-error-bg: rgba(244, 67, 54, 0.6); /* Couleur d'erreur inchangée */
+            
             --keypad-bg: rgba(255, 255, 255, 0.1);
         }
 
@@ -177,7 +183,7 @@
 
         .cell {
             background: var(--cell-bg-color);
-            color: #333333;
+            color: var(--cell-text-color); /* Texte en Blanc */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -188,18 +194,19 @@
         }
 
         .cell.fixed {
-            background: var(--fixed-cell-bg);
-            color: #555555;
+            background: var(--fixed-cell-bg); /* Fond Gris foncé */
+            color: var(--cell-fixed-text-color); /* Texte Gris clair */
             cursor: default;
             font-weight: bold;
         }
 
         .cell.selected {
-            background: rgba(0, 224, 255, 0.3) !important; 
+            background: var(--cell-selected-bg) !important; /* Fond Jaune Fluo */
+            box-shadow: 0 0 8px var(--grid-minor-border-color); /* Petite lueur jaune */
         }
         
         .cell.error {
-            background: rgba(244, 67, 54, 0.6) !important;
+            background: var(--cell-error-bg) !important;
             animation: shake 0.5s;
         }
 
