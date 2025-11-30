@@ -156,9 +156,12 @@
         }
         
         .cell.selected { 
-            background: #3a3a40 !important; /* Fond sélectionné légèrement plus clair */
-            box-shadow: 0 0 10px var(--secondary-neon-magenta), inset 0 0 5px var(--secondary-neon-magenta); /* Lueur sélectionnée */
-        } 
+            /* JAUNE VIF (Rétablit la couleur claire demandée) */
+            background: #FFD700 !important; 
+            color: var(--text-dark) !important; /* Force le texte des emojis à être sombre sur le fond clair */
+            /* Suppression des effets néon pour une meilleure visibilité */
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8), inset 0 0 5px rgba(255, 215, 0, 0.5); 
+        }
         
         .cell.fixed { 
             background: #1e1e22; /* Fond des cellules fixes encore plus foncé */
