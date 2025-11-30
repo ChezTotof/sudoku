@@ -552,3 +552,114 @@
         if (gameOver || selectedCellIndex === -1 || initialBoard[selectedCellIndex] !== 0) return;
 
         let cell = document.getElementById(`cell-${selectedCellIndex}`);
+        let correctVal = solution[selectedCellIndex];
+
+        if (num !== correctVal) {
+            mistakes++;
+            updateStatsUI();
+            saveGame(); 
+
+            // LOGIQUE d'erreur : Affiche l'emoji Vertige
+            const previousContent = cell.textContent;
+            cell.textContent = '😵‍💫'; // Emoji Vertige
+            cell.classList.add('error');
+            
+            setTimeout(() => {
+                if (!gameOver) {
+                    cell.classList.remove('error');
+                    // Réaffiche l'ancien contenu (s'il y en avait)
+                    cell.textContent = currentBoard[selectedCellIndex] !== 0 
+                                       ? emojis[currentBoard[selectedCellIndex] - 1] 
+                                       : '';
+                }
+            }, 800);
+            
+            if (mistakes >= maxMistakes) endGame(false);
+        } else {
+            currentBoard[selectedCellIndex] = num;
+            cell.textContent = emojis[num - 1];
+            cell.classList.remove('selected');
+            selectedCellIndex = -1;
+            
+            updateKeypadStatus();
+            saveGame(); // Sauvegarde le coup
+            checkWin();
+        }
+    }
+
+    function useHint() {
+        if (gameOver || hintsUsed >= maxHints) return;
+        
+        let targetIdx = selectedCellIndex;
+        if (targetIdx === -1 || currentBoard[targetIdx] !== 0) {
+           let emptyIndices = currentBoard.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null);
+           if (emptyIndices.length === 0) return;
+           targetIdx = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+           selectCell(targetIdx);
+        }
+
+        hintsUsed++;
+        let correctVal = solution[targetIdx];
+        currentBoard[targetIdx] = correctVal;
+        let cell = document.getElementById(`cell-${targetIdx}`);
+        cell.textContent = emojis[correctVal - 1];
+        
+        cell.style.transition = "all 0.3s";
+        cell.style.transform = "scale(1.2)";
+        cell.style.background = "rgba(0, 224, 255, 0.3)"; // Utilisation de la couleur néon pour l'indice
+        setTimeout(() => {
+             cell.style.transform = "scale(1)";
+             cell.style.background = "";
+        }, 300);
+
+        updateStatsUI();
+        updateKeypadStatus();
+        saveGame(); // Sauvegarde l'indice
+        checkWin();
+    }
+
+    function checkWin() {
+        if (!currentBoard.includes(0)) endGame(true);
+    }
+
+    function endGame(win) {
+        gameOver = true;
+        // Supprime la sauvegarde car la partie est finie
+        localStorage.removeItem(SAVE_KEY);
+        document.getElementById('btn-continue').style.display = 'none';
+
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modal-title');
+        const msg = document.getElementById('modal-msg');
+        
+        // --- Gérer l'animation de victoire ---
+        if (win) {
+            const boardDiv = document.getElementById('board');
+            boardDiv.classList.add('victory-animation'); // Ajout de la classe d'animation
+            
+            // Retirer l'animation après un court délai pour que la grille soit normale sur la modale
+            setTimeout(() => {
+                boardDiv.classList.remove('victory-animation');
+            }, 1500); // 1.5 seconde d'animation
+        }
+        // --- FIN GESTION ANIMATION ---
+
+        setTimeout(() => {
+            modal.style.display = 'flex';
+            if (win) {
+                title.innerHTML = "🎉 Victoire ! 🎉";
+                msg.textContent = "Bravo, tu as résolu le Emoji Sudoku !";
+            } else {
+                title.innerHTML = "☠️ Game Over ☠️";
+                msg.textContent = "Tu as fait 3 erreurs. Retente ta chance !";
+            }
+        }, 500);
+    }
+
+    function shareOnFacebook() {
+        const url = encodeURIComponent(window.location.href); 
+        const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        window.open(shareUrl, '_blank'); 
+        return false;
+    }
+</script>
