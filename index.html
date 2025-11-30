@@ -7,6 +7,7 @@
     <style>
         /* --- VARIABLES --- */
         /* --- VARIABLES --- */
+        /* --- VARIABLES --- */
         :root {
             --neon-pink: #FF0099;
             --neon-blue: #00E0FF; 
@@ -18,14 +19,16 @@
             --grid-minor-border-color: #EEFC00; 
             --grid-background: #000000;
 
-            /* COULEURS DES CELLULES (MODIFIÉES) */
-            --cell-bg-color: #000000; /* Fond des cellules en NOIR */
-            --fixed-cell-bg: #111111; /* Cellules initiales en Gris très foncé */
-            --cell-text-color: #FFFFFF; /* Couleur du texte principal en Blanc */
-            --cell-fixed-text-color: #AAAAAA; /* Couleur du texte fixe en Gris clair */
+            /* COULEURS DES CELLULES */
+            --cell-bg-color: #000000; 
+            --fixed-cell-bg: #111111; 
+            --cell-text-color: #FFFFFF; 
+            --cell-fixed-text-color: #AAAAAA; 
             
-            --cell-selected-bg: rgba(238, 252, 0, 0.5); /* Sélection en JAUNE FLUORO translucide */
-            --cell-error-bg: rgba(244, 67, 54, 0.6); /* Couleur d'erreur inchangée */
+            /* NOUVELLE COULEUR DE SÉLECTION EN BLEU TRÈS CLAIR */
+            --cell-selected-bg: rgba(180, 250, 255, 0.4); 
+            
+            --cell-error-bg: rgba(244, 67, 54, 0.6); 
             
             --keypad-bg: rgba(255, 255, 255, 0.1);
         }
@@ -201,8 +204,8 @@
         }
 
         .cell.selected {
-            background: var(--cell-selected-bg) !important; /* Fond Jaune Fluo */
-            box-shadow: 0 0 8px var(--grid-minor-border-color); /* Petite lueur jaune */
+            background: var(--cell-selected-bg) !important; /* Fond Bleu très clair */
+            box-shadow: 0 0 8px var(--neon-blue); /* Petite lueur BLEUE */
         }
         
         .cell.error {
